@@ -1,55 +1,60 @@
 import { useState } from "react";
+import { FaHands, FaPaw, FaSun, FaHeart, FaMobileAlt, FaPalette, FaArrowLeft, FaSearch, FaUsers, FaCheck, FaGlassCheers } from "react-icons/fa";
 
 const CATEGORIES = ["All", "Health", "Pets", "Daily Life", "Support", "Hobbies", "Education"];
 
 const GROUPS = [
   {
     id: 1, name: "Hand Recovery Support",
-    icon: "🤲", desc: "Connect with others in hand rehabilitation. Share tips, progress, and encouragement.",
-    members: "2.1k", color: "#6B3FA0", joined: false,
+    icon: <FaHands />, desc: "Connect with others in hand rehabilitation. Share tips, progress, and encouragement.",
+    members: 14, color: "#6B3FA0", joined: false, category: "Health"
   },
   {
     id: 2, name: "Pet Lover Community",
-    icon: "🐾", desc: "Share stories and tips about your beloved pets.",
-    members: "1.2k", color: "#F5A06A", joined: false,
+    icon: <FaPaw />, desc: "Share stories and tips about your beloved pets.",
+    members: 12, color: "#F5A06A", joined: false, category: "Pets"
   },
   {
     id: 3, name: "Daily Motivation",
-    icon: "☀️", desc: "Encourage and inspire each other every single day.",
-    members: "980", color: "#F5C030", joined: false,
+    icon: <FaSun />, desc: "Encourage and inspire each other every single day.",
+    members: 18, color: "#F5C030", joined: false, category: "Daily Life"
   },
   {
     id: 4, name: "Health & Wellness",
-    icon: "💚", desc: "Talk about healthy living, therapy tips, and adaptive tools.",
-    members: "1.5k", color: "#5AABAB", joined: false,
+    icon: <FaHeart />, desc: "Talk about healthy living, therapy tips, and adaptive tools.",
+    members: 15, color: "#5AABAB", joined: false, category: "Health"
   },
   {
     id: 5, name: "Adaptive Tech Tips",
-    icon: "📱", desc: "Discover apps, devices, and accessibility features that help.",
-    members: "640", color: "#A0C8E8", joined: false,
+    icon: <FaMobileAlt />, desc: "Discover apps, devices, and accessibility features that help.",
+    members: 11, color: "#A0C8E8", joined: false, category: "Education"
   },
   {
     id: 6, name: "Creative Arts",
-    icon: "🎨", desc: "Art, crafts, and creative expression adapted for everyone.",
-    members: "370", color: "#E87070", joined: false,
+    icon: <FaPalette />, desc: "Art, crafts, and creative expression adapted for everyone.",
+    members: 19, color: "#E87070", joined: false, category: "Hobbies"
   },
 ];
 
-export default function JoinGroupScreen({ onBack }) {
+export default function JoinGroupScreen({ onBack, onJoinedGroup }) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [confirmGroup, setConfirmGroup] = useState(null);
   const [joinedGroup, setJoinedGroup] = useState(null);
   const [joinedIds, setJoinedIds] = useState(new Set());
 
-  const filtered = GROUPS.filter(g =>
-    g.name.toLowerCase().includes(search.toLowerCase()) ||
-    g.desc.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = GROUPS.filter(g => {
+    const matchesSearch = g.name.toLowerCase().includes(search.toLowerCase()) || g.desc.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = activeCategory === "All" || g.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const handleJoin = () => {
     setJoinedIds(prev => new Set([...prev, confirmGroup.id]));
     setJoinedGroup(confirmGroup);
+    if (onJoinedGroup) {
+      onJoinedGroup({ ...confirmGroup, unread: 0, avatar: confirmGroup.icon });
+    }
     setConfirmGroup(null);
   };
 
@@ -62,7 +67,7 @@ export default function JoinGroupScreen({ onBack }) {
           aria-label="Back"
           onClick={onBack}
           style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px", minWidth: 44, minHeight: 44 }}
-        >←</button>
+        ><FaArrowLeft /></button>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Find Groups</h1>
       </div>
 
@@ -82,7 +87,7 @@ export default function JoinGroupScreen({ onBack }) {
               color: "#2D1B69",
             }}
           />
-          <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 22 }}>🔍</span>
+          <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 22 }}><FaSearch /></span>
         </div>
 
         {/* Category chips */}
@@ -136,7 +141,7 @@ export default function JoinGroupScreen({ onBack }) {
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 17, fontWeight: 700, color: "#2D1B69", margin: "0 0 4px", fontFamily: "system-ui, sans-serif" }}>{group.name}</p>
                 <p style={{ fontSize: 13, color: "#888", margin: "0 0 6px", fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>{group.desc}</p>
-                <p style={{ fontSize: 13, color: group.color, fontWeight: 600, margin: 0, fontFamily: "system-ui, sans-serif" }}>👥 {group.members} members</p>
+                <p style={{ fontSize: 13, color: group.color, fontWeight: 600, margin: 0, fontFamily: "system-ui, sans-serif" }}><FaUsers /> {group.members} members</p>
               </div>
             </div>
 
@@ -156,7 +161,7 @@ export default function JoinGroupScreen({ onBack }) {
                 transition: "all 0.2s",
               }}
             >
-              {joinedIds.has(group.id) ? "✅ Joined" : "Join Group"}
+              {joinedIds.has(group.id) ? "<><FaCheck /> Joined</>" : "Join Group"}
             </button>
           </div>
         ))}
@@ -185,14 +190,14 @@ export default function JoinGroupScreen({ onBack }) {
               {confirmGroup.desc}
             </p>
             <p style={{ fontSize: 14, color: "#888", marginBottom: 28, fontFamily: "system-ui, sans-serif" }}>
-              👥 {confirmGroup.members} members already inside
+              <FaUsers /> {confirmGroup.members} members already inside
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <button
                 onClick={handleJoin}
                 style={{ width: "100%", height: 60, borderRadius: 20, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 19, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(107,63,160,0.3)" }}
               >
-                ✅ Yes, Join Group
+                <><FaCheck /> Yes, Join Group</>
               </button>
               <button
                 onClick={() => setConfirmGroup(null)}
@@ -213,7 +218,7 @@ export default function JoinGroupScreen({ onBack }) {
           style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}
         >
           <div style={{ background: "white", borderRadius: 32, padding: "36px 28px", width: "100%", textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+            <div style={{ fontSize: 56, marginBottom: 16 }}><FaGlassCheers /></div>
             <p style={{ fontSize: 24, fontWeight: 800, color: "#6B3FA0", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>Welcome!</p>
             <p style={{ fontSize: 17, fontWeight: 600, color: "#2D1B69", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>
               You've joined {joinedGroup.name}

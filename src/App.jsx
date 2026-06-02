@@ -8,7 +8,7 @@ import ChatList from "./screens/Chatlist";
 import ChatScreen from "./screens/Chatscreen";
 import CallingScreen from "./screens/Callingscreen";
 import AddContactScreen from "./screens/Addcontactscreen";
-import CommunityScreen from "./screens/Communityscreen";
+import CommunityScreen, { initPosts } from "./screens/Communityscreen";
 import CreatePostScreen from "./screens/Createpostscreen";
 import PostPreviewScreen from "./screens/Postpreviewscreeen";
 import JoinGroupScreen from "./screens/Joingroupscreen";
@@ -26,12 +26,14 @@ export default function App() {
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [postText, setPostText] = useState("");
+  const [postImage, setPostImage] = useState(null);
   const [communityTab, setCommunityTab] = useState("discover");
+  const [posts, setPosts] = useState(initPosts);
   const [myGroups, setMyGroups] = useState([
-    { id: 1, name: "Pet Lovers", avatar: <FaCat />, color: "#C8A0E8", unread: 67, members: 312 },
-    { id: 2, name: "University Malaya", avatar: <FaGraduationCap />, color: "#E8C0A0", unread: 20, members: 850 },
-    { id: 3, name: "Helping Each Other", avatar: <FaHandsHelping />, color: "#F5A0A0", unread: 0, members: 428 },
-    { id: 4, name: "Class 2025", avatar: <FaBook />, color: "#A0D0E8", unread: 0, members: 65 },
+    { id: 1, name: "Pet Lovers", avatar: <FaCat />, color: "#C8A0E8", unread: 67, members: 15 },
+    { id: 2, name: "University Malaya", avatar: <FaGraduationCap />, color: "#E8C0A0", unread: 20, members: 12 },
+    { id: 3, name: "Helping Each Other", avatar: <FaHandsHelping />, color: "#F5A0A0", unread: 0, members: 18 },
+    { id: 4, name: "Class 2025", avatar: <FaBook />, color: "#A0D0E8", unread: 0, members: 14 },
   ]);
 
   const leaveGroup = (groupId) => setMyGroups(prev => prev.filter(g => g.id !== groupId));
@@ -47,6 +49,23 @@ export default function App() {
   });
 
   const go = (s) => setScreen(s);
+
+  const handlePost = () => {
+    const newPost = {
+      id: Date.now(),
+      user: "You",
+      avatar: <FaUser />,
+      color: "#D0C0F0",
+      text: postText,
+      image: postImage,
+      likes: 0,
+      time: "Just now",
+      commentsList: []
+    };
+    setPosts(prev => [newPost, ...prev]);
+    setCommunityTab("discover");
+    go("community");
+  };
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#1a1a2e" }}>
@@ -84,10 +103,10 @@ export default function App() {
         )}
 
         {/* ── Community Module ── */}
-        {screen === "community" && <CommunityScreen onBack={() => go("home")} onCreatePost={() => go("createpost")} onJoinGroup={() => go("joingroup")} onOpenGroup={(g) => { setSelectedGroup(g); setCommunityTab("mygroup"); go("groupchat"); }} defaultTab={communityTab} myGroups={myGroups} />}
-        {screen === "createpost" && <CreatePostScreen onBack={() => { setCommunityTab("discover"); go("community"); }} onNext={(text) => { setPostText(text); go("postpreview"); }} />}
-        {screen === "postpreview" && <PostPreviewScreen postText={postText} onBack={() => go("createpost")} onPost={() => { setCommunityTab("discover"); go("community"); }} />}
-        {screen === "joingroup" && <JoinGroupScreen onBack={() => { setCommunityTab("mygroup"); go("community"); }} />}
+        {screen === "community" && <CommunityScreen onBack={() => go("home")} onCreatePost={() => go("createpost")} onJoinGroup={() => go("joingroup")} onOpenGroup={(g) => { setSelectedGroup(g); setCommunityTab("mygroup"); go("groupchat"); }} defaultTab={communityTab} myGroups={myGroups} posts={posts} setPosts={setPosts} />}
+        {screen === "createpost" && <CreatePostScreen onBack={() => { setCommunityTab("discover"); go("community"); }} onNext={(text, image) => { setPostText(text); setPostImage(image); go("postpreview"); }} />}
+        {screen === "postpreview" && <PostPreviewScreen postText={postText} postImage={postImage} onBack={() => go("createpost")} onPost={handlePost} />}
+        {screen === "joingroup" && <JoinGroupScreen onBack={() => { setCommunityTab("mygroup"); go("community"); }} onJoinedGroup={(group) => { setMyGroups(prev => [...prev, { ...group, isNew: true }]); setCommunityTab("mygroup"); go("community"); }} />}
         {screen === "groupchat" && <GroupChatScreen group={selectedGroup} onBack={() => go("community")} onLeaveGroup={(id) => { leaveGroup(id); go("community"); }} />}
 
         {/* ── Profile Module ── */}

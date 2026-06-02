@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaArrowLeft, FaGlobeAmericas, FaUsers, FaHeart, FaRegHeart, FaComment, FaShare, FaUser, FaPaperPlane, FaChevronRight, FaPlus, FaArrowRight, FaCheckCircle } from "react-icons/fa";
 
-const initPosts = [
+export const initPosts = [
   {
     id: 1, user: "Anna", avatar: <FaUser />, color: "#E8A0A0",
     text: "Had a great day with my therapy session! Feeling so much stronger 💪",
@@ -54,9 +54,8 @@ const SHARE_CONTACTS = [
   { id: 4, name: "Alice", avatar: <FaUser />, color: "#A0C8A0" },
 ];
 
-export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onOpenGroup, defaultTab = "discover", myGroups = [] }) {
+export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onOpenGroup, defaultTab = "discover", myGroups = [], posts, setPosts }) {
   const [tab, setTab] = useState(defaultTab);
-  const [posts, setPosts] = useState(initPosts);
   const [liked, setLiked] = useState({});
   const [commenting, setCommenting] = useState(null); // post id showing comment section
   const [commentText, setCommentText] = useState("");
@@ -142,10 +141,17 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                 </div>
               </div>
 
-              {/* Post Text */}
-              <p style={{ fontSize: 16, color: "#2D1B69", fontFamily: "system-ui, sans-serif", margin: "0 0 14px", lineHeight: 1.6 }}>
-                {post.text}
-              </p>
+              {/* Post Text & Image */}
+              {post.text && (
+                <p style={{ fontSize: 16, color: "#2D1B69", fontFamily: "system-ui, sans-serif", margin: "0 0 14px", lineHeight: 1.6 }}>
+                  {post.text}
+                </p>
+              )}
+              {post.image && (
+                <div style={{ marginBottom: 14, borderRadius: 16, overflow: "hidden" }}>
+                  <img src={post.image} alt="Post media" style={{ width: "100%", maxHeight: 300, objectFit: "cover", display: "block" }} />
+                </div>
+              )}
 
               {/* Divider */}
               <div style={{ height: 1, background: "#F0EBF8", marginBottom: 12 }} />

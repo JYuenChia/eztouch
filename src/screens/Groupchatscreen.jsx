@@ -1,34 +1,39 @@
 import { useState, useRef, useEffect } from "react";
+import { FaUser, FaGlassCheers, FaSmile, FaHandshake, FaHands, FaLifeRing, FaClock, FaPray, FaThumbsUp, FaComment, FaCat, FaHeart, FaArrowLeft, FaCog, FaUndo, FaMicrophone, FaLightbulb, FaPaperPlane, FaBroadcastTower, FaMagic, FaExclamationTriangle, FaSignOutAlt } from "react-icons/fa";
 
 const MEMBERS = [
-  { id: 1, name: "Anna", avatar: "👩", color: "#E8A0A0" },
-  { id: 2, name: "Ravi", avatar: "👨", color: "#A0C8E8" },
-  { id: 3, name: "Mei Lin", avatar: "👧", color: "#F0C0B0" },
-  { id: 4, name: "David", avatar: "🧑", color: "#A0D0A0" },
-  { id: 5, name: "Sara", avatar: "👱‍♀️", color: "#C8A0E8" },
+  { id: 1, name: "Anna", avatar: <FaUser />, color: "#E8A0A0" },
+  { id: 2, name: "Ravi", avatar: <FaUser />, color: "#A0C8E8" },
+  { id: 3, name: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0" },
+  { id: 4, name: "David", avatar: <FaUser />, color: "#A0D0A0" },
+  { id: 5, name: "Sara", avatar: <FaUser />, color: "#C8A0E8" },
 ];
 
-function getInitMessages(groupName) {
+const DUMMY_NAMES = ["John", "Emily", "Michael", "Sarah", "Chris", "Jessica", "Daniel", "Lisa", "Matthew", "Ashley", "Andrew", "Amanda", "Joshua", "Nicole", "Kevin"];
+
+function getInitMessages(group) {
+  if (group?.isNew) return [];
+  const groupName = group?.name || "Pet Lovers";
   return [
-    { id: 1, text: `Welcome to ${groupName}! 🎉`, mine: false, user: "Anna", avatar: "👩", color: "#E8A0A0", time: "9:00 AM" },
-    { id: 2, text: "Hello everyone! So happy to be here 😊", mine: false, user: "Ravi", avatar: "👨", color: "#A0C8E8", time: "9:02 AM" },
-    { id: 3, text: "Hi all! Looking forward to connecting with you all 🤝", mine: true, time: "9:05 AM" },
-    { id: 4, text: "Has anyone tried the voice typing feature yet? It's amazing for those of us with hand difficulties!", mine: false, user: "Mei Lin", avatar: "👧", color: "#F0C0B0", time: "9:08 AM" },
-    { id: 5, text: "Yes! Life changing! 🙌", mine: false, user: "David", avatar: "🧑", color: "#A0D0A0", time: "9:10 AM" },
+    { id: 1, text: <>Welcome to {groupName}! <FaGlassCheers /></>, mine: false, user: "Anna", avatar: <FaUser />, color: "#E8A0A0", time: "9:00 AM" },
+    { id: 2, text: <>Hello everyone! So happy to be here <FaSmile /></>, mine: false, user: "Ravi", avatar: <FaUser />, color: "#A0C8E8", time: "9:02 AM" },
+    { id: 3, text: <>Hi all! Looking forward to connecting with you all <FaHandshake /></>, mine: true, time: "9:05 AM" },
+    { id: 4, text: "Has anyone tried the voice typing feature yet? It's amazing for those of us with hand difficulties!", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+    { id: 5, text: <>Yes! Life changing! <FaHands /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" },
   ];
 }
 
 const quickReplies = [
-  { label: "I need help 🆘", color: "#B0A8D0" },
-  { label: "Give me some time ⏰", color: "#F5A06A" },
-  { label: "Thank you! 🙏", color: "#E87070" },
-  { label: "That's great! 🎉", color: "#5AABAB" },
-  { label: "I agree 👍", color: "#A0C8A0" },
-  { label: "Can we talk? 💬", color: "#C8A0E8" },
+  { label: <>I need help <FaLifeRing /></>, color: "#B0A8D0" },
+  { label: <>Give me some time <FaClock /></>, color: "#F5A06A" },
+  { label: <>Thank you! <FaPray /></>, color: "#E87070" },
+  { label: <>That's great! <FaGlassCheers /></>, color: "#5AABAB" },
+  { label: <>I agree <FaThumbsUp /></>, color: "#A0C8A0" },
+  { label: <>Can we talk? <FaComment /></>, color: "#C8A0E8" },
 ];
 
 export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
-  const [messages, setMessages] = useState(() => getInitMessages(group?.name || "Pet Lovers"));
+  const [messages, setMessages] = useState(() => getInitMessages(group));
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main");
   const [transcribed, setTranscribed] = useState("");
@@ -41,8 +46,26 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
   const bottomRef = useRef(null);
 
   const name = group?.name || "Pet Lovers";
-  const avatar = group?.avatar || "🐱";
+  const avatar = group?.avatar || <FaCat />;
   const avatarColor = group?.color || "#C8A0E8";
+  const totalMembersCount = group?.members || (MEMBERS.length + 1);
+
+  const [dummyMembers, setDummyMembers] = useState([]);
+
+  useEffect(() => {
+    const needed = totalMembersCount - 1 - MEMBERS.length;
+    if (needed > 0) {
+      const generated = Array.from({ length: needed }, (_, i) => ({
+        id: 100 + i,
+        name: DUMMY_NAMES[i % DUMMY_NAMES.length],
+        avatar: <FaUser />,
+        color: ["#E8A0A0", "#A0C8E8", "#F0C0B0", "#A0D0A0", "#C8A0E8", "#F5A06A"][i % 6]
+      }));
+      setDummyMembers(generated);
+    } else {
+      setDummyMembers([]);
+    }
+  }, [totalMembersCount]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -62,11 +85,11 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
     setTimeout(() => {
       const member = MEMBERS[Math.floor(Math.random() * MEMBERS.length)];
       const replies = [
-        "Thanks for sharing! 😊",
+        <>Thanks for sharing! <FaSmile /></>,
         "That's really helpful!",
-        "I feel the same way 🤝",
-        "Great point! 👍",
-        "So true! This community is amazing ❤️",
+        <>I feel the same way <FaHandshake /></>,
+        <>Great point! <FaThumbsUp /></>,
+        <>So true! This community is amazing <FaHeart /></>,
       ];
       const reply = replies[Math.floor(Math.random() * replies.length)];
       const replyTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -89,7 +112,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("❌ Voice recognition is not supported. Please use Google Chrome or Microsoft Edge.");
+      alert("Voice recognition is not supported. Please use Google Chrome or Microsoft Edge.");
       setRecording(false);
       setPulse(false);
       return;
@@ -108,7 +131,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
 
     recog.onerror = (err) => {
       if (err.error === "not-allowed") {
-        alert("⚠️ Microphone blocked! Please allow mic access in your browser.");
+        alert("Microphone blocked! Please allow mic access in your browser.");
       }
       setRecording(false);
       setPulse(false);
@@ -144,19 +167,19 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
           aria-label="Back"
           onClick={onBack}
           style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 10px", minWidth: 44, minHeight: 44 }}
-        >←</button>
+        ><FaArrowLeft /></button>
         <div style={{ width: 46, height: 46, borderRadius: 23, background: avatarColor + "44", border: `2px solid ${avatarColor}88`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
           {avatar}
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 18, fontWeight: 700, color: "#2D1B69", margin: 0, fontFamily: "system-ui, sans-serif" }}>{name}</p>
-          <p style={{ fontSize: 12, color: "#888", margin: 0, fontFamily: "system-ui, sans-serif" }}>{MEMBERS.length + 1} members</p>
+          <p style={{ fontSize: 12, color: "#888", margin: 0, fontFamily: "system-ui, sans-serif" }}>{totalMembersCount} members</p>
         </div>
         <button
           aria-label="Group settings"
           onClick={() => setShowMembersModal(true)}
           style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#6B3FA0", padding: "8px 10px", minWidth: 44, minHeight: 44 }}
-        >⚙️</button>
+        ><FaCog /></button>
       </div>
 
       {/* Messages */}
@@ -179,9 +202,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 <button
                   onClick={undoLastMessage}
                   style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#6B3FA0", padding: "8px", fontFamily: "system-ui, sans-serif", whiteSpace: "nowrap" }}
-                >
-                  ↩ UNDO
-                </button>
+                ><FaUndo /> UNDO</button>
               )}
               <div style={{
                 maxWidth: "75%",
@@ -212,14 +233,14 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 onClick={() => { setMode("voiceRecord"); startVoice(); }}
                 style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFF0E5", border: "2px solid #F5A06A", borderRadius: 22, padding: "16px 10px", cursor: "pointer" }}
               >
-                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5A06A,#E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🎙️</div>
+                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5A06A,#E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaMicrophone /></div>
                 <span style={{ fontSize: 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Voice to Text</span>
               </button>
               <button
                 onClick={() => setMode("quickMsg")}
                 style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFFBEA", border: "2px solid #F5C030", borderRadius: 22, padding: "16px 10px", cursor: "pointer" }}
               >
-                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5C030,#E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>💡</div>
+                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5C030,#E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaLightbulb /></div>
                 <span style={{ fontSize: 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Taps</span>
               </button>
             </div>
@@ -235,7 +256,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 aria-label="Send message"
                 onClick={() => { if (input.trim()) { setTranscribed(input); setMode("voiceConfirm"); } }}
                 style={{ width: 58, height: 58, borderRadius: 29, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
-              >➤</button>
+              ><FaPaperPlane /></button>
             </div>
           </>
         )}
@@ -243,7 +264,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
         {/* VOICE RECORDING mode */}
         {mode === "voiceRecord" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "8px 0" }}>
-            <span style={{ fontSize: 15, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>🎙️ Group Voice Input</span>
+            <span style={{ fontSize: 15, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaMicrophone /> Group Voice Input</span>
             <div style={{
               width: 88, height: 88, borderRadius: 44,
               background: "linear-gradient(135deg,#F5A06A,#E87030)",
@@ -251,7 +272,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
               boxShadow: pulse ? "0 0 0 18px rgba(245,160,106,0.2)" : "0 6px 20px rgba(245,160,106,0.3)",
               transition: "box-shadow 0.4s",
             }}>
-              {recording ? "📡" : "✨"}
+              {recording ? <FaBroadcastTower /> : <FaMagic />}
             </div>
             <p style={{ fontSize: 16, color: "#E87030", fontWeight: 700, fontFamily: "system-ui, sans-serif", margin: 0 }}>
               {recording ? "Listening..." : "Processing..."}
@@ -265,7 +286,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
         {/* VOICE CONFIRM mode */}
         {mode === "voiceConfirm" && (
           <div style={{ background: "#F0EBFF", borderRadius: 22, padding: 18, border: "3px solid #6B3FA0" }}>
-            <p style={{ fontSize: 13, color: "#6B3FA0", fontWeight: 800, margin: "0 0 4px", fontFamily: "system-ui, sans-serif", letterSpacing: 0.5 }}>⚠️ ANTI-ACCIDENTAL PREVIEW</p>
+            <p style={{ fontSize: 13, color: "#6B3FA0", fontWeight: 800, margin: "0 0 4px", fontFamily: "system-ui, sans-serif", letterSpacing: 0.5 }}><FaExclamationTriangle /> ANTI-ACCIDENTAL PREVIEW</p>
             <p style={{ fontSize: 14, color: "#2D1B69", fontWeight: 500, margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>Review your message before sending to the group:</p>
             <textarea
               value={transcribed}
@@ -284,7 +305,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
         {mode === "quickMsg" && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <button onClick={() => setMode("main")} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#6B3FA0", padding: "8px", minWidth: 44, minHeight: 44 }}>← Back</button>
+              <button onClick={() => setMode("main")} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#6B3FA0", padding: "8px", minWidth: 44, minHeight: 44 }}><FaArrowLeft /> Back</button>
               <span style={{ fontSize: 17, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Group Taps</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -316,28 +337,26 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
           >
             {/* Drag handle */}
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "#D0B8F5", margin: "0 auto 18px", flexShrink: 0 }} />
-            <p style={{ fontSize: 19, fontWeight: 800, color: "#2D1B69", margin: "0 0 16px", fontFamily: "system-ui, sans-serif", flexShrink: 0 }}>
-              ⚙️ Group Settings
-            </p>
+            <p style={{ fontSize: 19, fontWeight: 800, color: "#2D1B69", margin: "0 0 16px", fontFamily: "system-ui, sans-serif", flexShrink: 0 }}> <FaCog /> Group Settings </p>
 
             {/* Members label */}
             <p style={{ fontSize: 12, fontWeight: 700, color: "#AAA", margin: "0 0 10px", fontFamily: "system-ui, sans-serif", letterSpacing: 1, textTransform: "uppercase", flexShrink: 0 }}>
-              MEMBERS ({MEMBERS.length + 1})
+              MEMBERS ({totalMembersCount})
             </p>
 
             {/* Scrollable members list — fixed height so Leave button always shows */}
             <div style={{ overflowY: "auto", maxHeight: 220, display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
               {/* Me */}
               <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#F0E8FF", borderRadius: 16, padding: "10px 14px", flexShrink: 0 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 21, background: "#D0C0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>👤</div>
+                <div style={{ width: 42, height: 42, borderRadius: 21, background: "#D0C0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><FaUser /></div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 15, fontWeight: 700, color: "#2D1B69", margin: 0, fontFamily: "system-ui, sans-serif" }}>You</p>
-                  <p style={{ fontSize: 12, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Member · Admin</p>
+                  <p style={{ fontSize: 12, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Member</p>
                 </div>
               </div>
 
               {/* Other members */}
-              {MEMBERS.map(m => (
+              {[...MEMBERS, ...dummyMembers].map(m => (
                 <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 14, background: "#F8F8FF", borderRadius: 16, padding: "10px 14px", flexShrink: 0 }}>
                   <div style={{ width: 42, height: 42, borderRadius: 21, background: m.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{m.avatar}</div>
                   <div style={{ flex: 1 }}>
@@ -362,9 +381,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 flexShrink: 0,
               }}
-            >
-              🚪 Leave Group
-            </button>
+            > <FaSignOutAlt /> Leave Group </button>
           </div>
         </div>
       )}
@@ -377,7 +394,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
           style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 24 }}
         >
           <div style={{ background: "white", borderRadius: 32, padding: "32px 24px", width: "100%", textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🚪</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><FaSignOutAlt /></div>
             <p style={{ fontSize: 21, fontWeight: 800, color: "#2D1B69", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>Leave {name}?</p>
             <p style={{ fontSize: 14, color: "#888", marginBottom: 28, fontFamily: "system-ui, sans-serif", lineHeight: 1.6 }}>
               You will no longer receive messages from this group. You can rejoin anytime.
