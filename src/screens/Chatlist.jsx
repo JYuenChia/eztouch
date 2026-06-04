@@ -103,14 +103,18 @@ export default function ChatList({ onBack, onOpenChat, contacts = defaultContact
         borderBottom: "1px solid #E8E0F8",
         flexShrink: 0,
       }}>
-        <button aria-label="Back" onClick={onBack} style={{
-          background: "none",
-          border: "none",
-          fontSize: 28,
-          cursor: "pointer",
-          color: "#6B3FA0",
-          padding: 4,
-        }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
+        <button
+                  onClick={onBack}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: 26,
+                    cursor: "pointer",
+                    color: "#6B3FA0",
+                  }}
+                >
+                  <FaArrowLeft />
+                </button>
         <h1 style={{
           fontSize: 28,
           fontWeight: 700,

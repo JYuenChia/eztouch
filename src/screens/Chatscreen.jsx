@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 
 const mockMessages = [
   { id: 1, text: "Hey! Are you free today?", mine: false },
@@ -127,7 +128,23 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
 
       {/* Header */}
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button aria-label="Back" onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px" }}>←</button>
+        <button
+  onClick={onBack}
+  aria-label="Back"
+  style={{
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#6B3FA0",
+    width: 48,
+    height: 48,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <FaArrowLeft size={28} />
+</button>
         <div style={{ width: 46, height: 46, borderRadius: 23, background: avatarColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{avatar}</div>
         <span style={{ flex: 1, fontSize: 20, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{name}</span>
         <button aria-label="Call contact" onClick={() => setMode("callConfirm")} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px" }}>📞</button>

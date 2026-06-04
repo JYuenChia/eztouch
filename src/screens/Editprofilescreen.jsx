@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 
 export default function EditProfileScreen({ onBack, onSaved }) {
   const [form, setForm] = useState({ username: "Username", email: "user@example.com", phone: "+123 456 7890", bio: "" });
@@ -25,7 +26,18 @@ export default function EditProfileScreen({ onBack, onSaved }) {
 
       {/* Header */}
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button
+                  onClick={onBack}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: 26,
+                    cursor: "pointer",
+                    color: "#6B3FA0",
+                  }}
+                >
+                  <FaArrowLeft />
+                </button>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Edit Profile</h1>
       </div>
 
