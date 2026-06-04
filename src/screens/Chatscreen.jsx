@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 const mockMessages = [
   { id: 1, text: "Hey! Are you free today?", mine: false },
@@ -23,6 +24,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
   const [recording, setRecording] = useState(false);
   const [undoMsg, setUndoMsg] = useState(null);
   const [pulse, setPulse] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
 
   const name = contact?.name || "Boyfriend";
   const avatar = contact?.avatar || "🧍";
@@ -35,6 +37,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
     setTimeout(() => setUndoMsg(null), 10000); // 10 second undo safety window
     setMode("main");
     setInput("");
+    setShowKeyboard(false);
   };
 
   const undoLastMessage = () => {
@@ -201,12 +204,17 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
               </button>
             </div>
             
+            
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <textarea
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder="Type your message here..." rows={2}
-                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69" }} 
+
+                readOnly
+
+                onFocus={() => setShowKeyboard(true)}
+                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor:"pointer"}} 
               />
               <button aria-label="Send message" onClick={() => { if (input.trim()) { setTranscribed(input); setMode("voiceConfirm"); } }}
                 style={{ width: 60, height: 60, borderRadius: 30, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>➤</button>
@@ -305,6 +313,14 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             </div>
           </div>
         </div>
+      )}
+
+      {mode === "main" && showKeyboard &&(
+        <ReactiveKeyboard 
+          value={input} 
+          onChange={setInput} 
+          onSubmit={() => sendMessage(input)} 
+        />
       )}
     </div>
   );

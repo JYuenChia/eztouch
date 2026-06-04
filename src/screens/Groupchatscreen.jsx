@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { FaUser, FaGlassCheers, FaSmile, FaHandshake, FaHands, FaLifeRing, FaClock, FaPray, FaThumbsUp, FaComment, FaCat, FaHeart, FaArrowLeft, FaCog, FaUndo, FaMicrophone, FaLightbulb, FaPaperPlane, FaBroadcastTower, FaMagic, FaExclamationTriangle, FaSignOutAlt } from "react-icons/fa";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 const MEMBERS = [
   { id: 1, name: "Anna", avatar: <FaUser />, color: "#E8A0A0" },
@@ -44,7 +45,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const [hasLeft, setHasLeft] = useState(false);
   const bottomRef = useRef(null);
-
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  
   const name = group?.name || "Pet Lovers";
   const avatar = group?.avatar || <FaCat />;
   const avatarColor = group?.color || "#C8A0E8";
@@ -80,6 +82,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
     setTimeout(() => setUndoId(null), 10000);
     setMode("main");
     setInput("");
+    setShowKeyboard(false);
 
     // Simulate a group member reply after 2s
     setTimeout(() => {
@@ -250,7 +253,12 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 onChange={e => setInput(e.target.value)}
                 placeholder="Type your message here..."
                 rows={2}
-                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69" }}
+
+                readOnly
+
+                onFocus={() => setShowKeyboard(true)}
+                
+                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor:"pointer"}} 
               />
               <button
                 aria-label="Send message"
@@ -419,6 +427,13 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
             </div>
           </div>
         </div>
+      )}
+      {mode === "main" && showKeyboard &&(
+        <ReactiveKeyboard 
+          value={input} 
+          onChange={setInput} 
+          onSubmit={() => sendMessage(input)} 
+        />
       )}
     </div>
   );
