@@ -51,16 +51,16 @@ export default function LoginScreen({ onLogin, onRegister }) {
         flexShrink: 0,
       }}>
         <div style={{
-          width: 64,
-          height: 64,
-          borderRadius: 32,
+          width: 100,
+          height: 100,
+          borderRadius: 50,
           background: "rgba(255,255,255,0.2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 16px",
           fontSize: 30,
-        }}><FaHandPaper style={{ color: "currentColor" }} /></div>
+        }}><FaHandPaper style={{ color: "rgb(234, 223, 0)" }} /></div>
         <h1 style={{
           color: "white",
           fontSize: 32,
