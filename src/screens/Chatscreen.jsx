@@ -298,7 +298,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
           <div style={{ background: "white", borderRadius: 32, padding: "32px 24px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>📞</div>
             <p style={{ fontSize: 22, fontWeight: 800, color: "#2D1B69", marginBottom: 8, fontFamily: "system-ui, sans-serif" }}>Confirm Call?</p>
-            <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Are you sure you want to initialize a voice call to {name}?</p>
+            <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Call '{name}'?</p>
             <div style={{ display: "flex", gap: 16 }}>
               <button onClick={() => setMode("main")} style={{ flex: 1, height: 56, borderRadius: 16, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>NO</button>
               <button ref={yesCallRef} onClick={() => { setMode("main"); onCall(contact); }} style={{ flex: 1, height: 56, borderRadius: 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>YES</button>
