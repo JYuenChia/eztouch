@@ -69,7 +69,7 @@ export default function App() {
   };
 
   return (
-    <SizeProvider>
+    //<SizeProvider>
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#1a1a2e" }}>
       <div style={{ width: 390, height: 844, borderRadius: 44, overflow: "hidden", position: "relative", boxShadow: "0 0 0 10px #111, 0 0 0 12px #333", background: "#fff" }}>
 
@@ -124,6 +124,6 @@ export default function App() {
 
       </div>
     </div>
-    </SizeProvider>
+   //</SizeProvider> 
   );
 }

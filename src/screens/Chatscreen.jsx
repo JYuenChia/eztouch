@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
+import SafeButton from "../components/SafeButton";
 
 const mockMessages = [
   { id: 1, text: "Hey! Are you free today?", mine: false },
@@ -117,13 +118,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
     }
   };
 
-  const yesCallRef = useRef(null);
-
-  useEffect(() => {
-    if (mode === "callConfirm" && yesCallRef.current) {
-      yesCallRef.current.focus();
-    }
-  }, [mode]);
+  
 
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column", position: "relative" }}>
@@ -270,7 +265,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             {/* Highly segregated action targets spaced out clearly to prevent execution errors */}
             <div style={{ display: "flex", gap: 20 }}>
               <button onClick={() => setMode("main")} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND MESSAGE</button>
+              <SafeButton onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND MESSAGE</SafeButton>
             </div>
           </div>
         )}
@@ -284,10 +279,10 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {quickReplies.map(r => (
-                <button key={r.label} onClick={() => sendMessage(r.label)}
+                <SafeButton key={r.label} onClick={() => sendMessage(r.label)}
                   style={{ width: "100%", height: sz.height, borderRadius: 28, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 10px rgba(0,0,0,0.08)" }}>
                   {r.label}
-                </button>
+                </SafeButton>
               ))}
             </div>
           </div>
@@ -302,8 +297,8 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             <p style={{ fontSize: 22, fontWeight: 800, color: "#2D1B69", marginBottom: 8, fontFamily: "system-ui, sans-serif" }}>Confirm Call?</p>
             <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Are you sure you want to initialize a voice call to {name}?</p>
             <div style={{ display: "flex", gap: 16 }}>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>NO</button>
-              <button ref={yesCallRef} onClick={() => { setMode("main"); onCall(contact); }} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>YES</button>
+              <SafeButton onClick={() => setMode("main")} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>NO</SafeButton>
+              <SafeButton  onClick={() => { setMode("main"); onCall(contact); }} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>YES</SafeButton>
             </div>
           </div>
         </div>
