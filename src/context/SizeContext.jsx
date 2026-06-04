@@ -1,30 +1,3 @@
-/*import { createContext, useContext, useState } from "react";
-
-export const sizeConfig = {
-  Small:  { fontSize: 13, height: 42, borderRadius: 10, tileLabelSize: 16, tileMinHeight: 68,  tileIconSize: 42, tileIconFont: 20, tilePadding: "10px 16px", settingPadding: "10px 18px", avatarSize: 36, avatarFont: 18 },
-  Medium: { fontSize: 17, height: 56, borderRadius: 16, tileLabelSize: 22, tileMinHeight: 95,  tileIconSize: 60, tileIconFont: 28, tilePadding: "20px 24px", settingPadding: "16px 22px", avatarSize: 50, avatarFont: 24 },
-  Large:  { fontSize: 22, height: 72, borderRadius: 22, tileLabelSize: 30, tileMinHeight: 120, tileIconSize: 78, tileIconFont: 36, tilePadding: "28px 28px", settingPadding: "22px 22px", avatarSize: 62, avatarFont: 30 },
-};
-
-const SizeContext = createContext({
-  size: "Medium",
-  sz: sizeConfig.Medium,
-  setSize: () => {},
-});
-
-export function SizeProvider({ children }) {
-  const [size, setSize] = useState("Medium");
-  return (
-    <SizeContext.Provider value={{ size, sz: sizeConfig[size], setSize }}>
-      {children}
-    </SizeContext.Provider>
-  );
-}
-
-export function useSizeContext() {
-  return useContext(SizeContext);
-}*/
-
 import {
   createContext,
   useContext,
@@ -107,6 +80,20 @@ export function SizeProvider({ children }) {
   const [touchDelay, setTouchDelay] =
   useState(true);
 
+  const [confirmationMode, setConfirmationMode] =
+  useState(true);
+
+  const [confirmSendMessage, setConfirmSendMessage] =
+    useState(true);
+
+  const [confirmCalls, setConfirmCalls] =
+    useState(true);
+
+  const [confirmationType, setConfirmationType] =
+    useState("Popup Confirmation");
+
+  const [confirmLikes, setConfirmLikes] =
+  useState(false);
   // =========================
   // LOAD SAVED SETTINGS
   // =========================
@@ -140,7 +127,25 @@ export function SizeProvider({ children }) {
       setTouchDelay(
         savedSettings.touchDelay ?? true
       );
+      setConfirmationMode(
+        savedSettings.confirmationMode ?? true
+      );
 
+      setConfirmSendMessage(
+        savedSettings.confirmSendMessage ?? true
+      );
+
+      setConfirmCalls(
+        savedSettings.confirmCalls ?? true
+      );
+
+      setConfirmationType(
+        savedSettings.confirmationType ??
+        "Popup Confirmation"
+);
+      setConfirmLikes(
+  savedSettings.confirmLikes ?? false
+);
     }
 
   }, []);
@@ -162,6 +167,11 @@ export function SizeProvider({ children }) {
         longPressMode,
         doubleTapMode,
         touchDelay,
+        confirmationMode,
+        confirmSendMessage,
+        confirmCalls,
+        confirmationType,
+        confirmLikes,
       })
     );
 
@@ -172,6 +182,13 @@ export function SizeProvider({ children }) {
     disableOneTap,
     longPressMode,
     doubleTapMode,
+    touchDelay,
+    confirmationMode,
+    confirmSendMessage,
+    confirmCalls,
+    confirmationType,
+    confirmLikes,
+
   ]);
 
   return (
@@ -197,9 +214,24 @@ export function SizeProvider({ children }) {
 
         doubleTapMode,
         setDoubleTapMode,
-        
+
         touchDelay,
         setTouchDelay,
+
+        confirmationMode,
+        setConfirmationMode,
+
+        confirmSendMessage,
+        setConfirmSendMessage,
+
+        confirmCalls,
+        setConfirmCalls,
+
+        confirmationType,
+        setConfirmationType,
+
+        confirmLikes,
+        setConfirmLikes,
       }}
     >
       {children}

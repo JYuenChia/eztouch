@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaArrowLeft, FaGlobeAmericas, FaUsers, FaHeart, FaRegHeart, FaComment, FaShare, FaUser, FaPaperPlane, FaChevronRight, FaPlus, FaArrowRight, FaCheckCircle } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
+import SafeButton from "../components/SafeButton";
 
 export const initPosts = [
   {
@@ -161,7 +162,8 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
               {/* Action buttons — Like | Comment | Share (3 only) */}
               <div style={{ display: "flex", gap: 8 }}>
                 {/* Like */}
-                <button
+                <SafeButton
+                  confirmationFor="like"
                   aria-label={liked[post.id] ? "Unlike post" : "Like post"}
                   onClick={() => toggleLike(post.id)}
                   style={{
@@ -173,10 +175,11 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                 >
                   <span style={{ fontSize: 18, display: "flex" }}>{liked[post.id] ? <FaHeart color="#E83030" /> : <FaRegHeart color="#888" />}</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: liked[post.id] ? "#6B3FA0" : "#888", fontFamily: "system-ui, sans-serif" }}>{post.likes}</span>
-                </button>
+                </SafeButton>
 
                 {/* Comment */}
-                <button
+                <SafeButton
+                  confirmationFor="like"
                   aria-label="Comment on post"
                   onClick={() => { setCommenting(commenting === post.id ? null : post.id); setCommentText(""); }}
                   style={{
@@ -190,7 +193,7 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                   <span style={{ fontSize: 14, fontWeight: 700, color: commenting === post.id ? "#6B3FA0" : "#888", fontFamily: "system-ui, sans-serif" }}>
                     {(post.commentsList || []).length}
                   </span>
-                </button>
+                 </SafeButton>
 
                 {/* Share */}
                 <button

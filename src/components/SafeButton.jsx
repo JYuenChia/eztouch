@@ -2,10 +2,10 @@ import { useState, useRef } from "react";
 import { useSizeContext } from "../context/SizeContext";
 
 export default function SafeButton({
-
   children,
   onClick,
   style = {},
+  confirmationFor = null,
 }) {
 
   const {
@@ -13,6 +13,11 @@ export default function SafeButton({
     longPressMode,
     doubleTapMode,
     touchDelay,
+    confirmationMode,
+    confirmSendMessage,
+    confirmCalls,
+    confirmationType,
+    confirmLikes,
   } = useSizeContext();
 
   const [disabled, setDisabled] = useState(false);
@@ -45,6 +50,114 @@ export default function SafeButton({
         return;
       }
     }
+
+// =========================
+// CONFIRMATION MODE
+// =========================
+
+if (confirmationMode) {
+
+  // MESSAGE CONFIRMATION
+  if (
+    confirmationFor === "message" &&
+    confirmSendMessage
+  ) {
+
+    // POPUP CONFIRMATION
+    if (
+      confirmationType ===
+      "Popup Confirmation"
+    ) {
+
+      const confirmed =
+        window.confirm(
+          "Send this message?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    // DOUBLE TAP CONFIRM
+    if (
+      confirmationType ===
+      "Double-tap-confirm"
+    ) {
+
+      setTapCount(prev => prev + 1);
+
+      setTimeout(() => {
+        setTapCount(0);
+      }, 500);
+
+      if (tapCount !== 1) {
+        return;
+      }
+    }
+  }
+
+  // CALL CONFIRMATION
+  if (
+    confirmationFor === "call" &&
+    confirmCalls
+  ) {
+
+    if (
+      confirmationType ===
+      "Popup Confirmation"
+    ) {
+
+      const confirmed =
+        window.confirm(
+          "Start this call?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+  }
+  // LIKE / COMMENT CONFIRMATION
+if (
+  confirmationFor === "like" &&
+  confirmLikes
+) {
+
+  // POPUP CONFIRMATION
+  if (
+    confirmationType ===
+    "Popup Confirmation"
+  ) {
+
+    const confirmed =
+      window.confirm(
+        "Like or comment on this post?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+  }
+
+  // DOUBLE TAP CONFIRM
+  if (
+    confirmationType ===
+    "Double-tap-confirm"
+  ) {
+
+    setTapCount(prev => prev + 1);
+
+    setTimeout(() => {
+      setTapCount(0);
+    }, 500);
+
+    if (tapCount !== 1) {
+      return;
+    }
+  }
+}
+}
 
     // =========================
 // EXECUTE ACTION

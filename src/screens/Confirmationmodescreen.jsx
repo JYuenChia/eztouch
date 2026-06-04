@@ -14,17 +14,30 @@ function Toggle({ value, onChange }) {
 
 export default function ConfirmationModeScreen({ onBack }) {
   const { sz } = useSizeContext();
-  const [master, setMaster] = useState(true);
-  const [actions, setActions] = useState({ sendMsg: true, likeComment: false, makeCalls: true });
-  const [confirmType, setConfirmType] = useState("Popup Confirmation");
+  const {
+  confirmationMode,
+  setConfirmationMode,
+
+  confirmSendMessage,
+  setConfirmSendMessage,
+
+  confirmCalls,
+  setConfirmCalls,
+
+  confirmationType,
+  setConfirmationType,
+
+  confirmLikes,
+  setConfirmLikes,  
+
+} = useSizeContext();
   const [showDemo, setShowDemo] = useState(false);
 
-  const toggle = key => val => setActions(a => ({ ...a, [key]: val }));
 
   const types = [
-    { label: "Popup Confirmation", color: "#F5C030", desc: "A popup asks you to confirm before any action executes." },
-    { label: "Hold-to-confirm", color: "#FFD0E0", desc: "Hold the button down for 1.5 seconds to confirm." },
-    { label: "Double-tap-confirm", color: "#C8E8FF", desc: "Tap the button twice to confirm the action." },
+    { label: "Popup Confirmation", color:"#F4B183", desc: "A popup asks you to confirm before any action executes." },
+    { label: "Hold-to-confirm", color: "#F6C6D3", desc: "Hold the button down for 1.5 seconds to confirm." },
+    { label: "Double-tap-confirm", color: "#A9D4E4", desc: "Tap the button twice to confirm the action." },
   ];
 
   return (
@@ -50,36 +63,58 @@ export default function ConfirmationModeScreen({ onBack }) {
             <p style={{ fontSize: 17, fontWeight: 700, color: "#2D1B69", margin: "0 0 3px", fontFamily: "system-ui, sans-serif" }}>Confirmation mode</p>
             <p style={{ fontSize: 12, color: "#888", margin: 0, fontFamily: "system-ui, sans-serif" }}>Ask before executing sensitive actions</p>
           </div>
-          <Toggle value={master} onChange={setMaster} />
+          <Toggle value={confirmationMode} onChange={setConfirmationMode} />
         </div>
 
-        {master && (
+        {confirmationMode && (
           <>
             <p style={{ fontSize: 14, fontWeight: 700, color: "#2D1B69", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>List of actions covered by confirmation:</p>
 
             {[
-              { key: "sendMsg", label: "Sending Message", color: "#E8E0F8", icon: <FaComments style={{ color: "currentColor" }} /> },
-              { key: "likeComment", label: "Liking/Commenting Posts", color: "#FFE0E8", icon: <FaHeart style={{ color: "currentColor" }} /> },
-              { key: "makeCalls", label: "Making Calls", color: "#D8F5E8", icon: <FaPhoneAlt style={{ color: "currentColor" }} /> },
+              { key: "sendMsg", label: "Sending Message", color: "#F4B183", icon: <FaComments style={{ color: "currentColor" }} /> },
+              { key: "likeComment", label: "Liking/Commenting Posts", color: "#F6C6D3", icon: <FaHeart style={{ color: "currentColor" }} /> },
+              { key: "makeCalls", label: "Making Calls", color: "#A9D4E4", icon: <FaPhoneAlt style={{ color: "currentColor" }} /> },
             ].map(item => (
               <div key={item.key} style={{ background: item.color, borderRadius: 14, padding: "12px 16px", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 20, color: "#6B3FA0" }}>{item.icon}</span>
                   <span style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{item.label}</span>
                 </div>
-                <Toggle value={actions[item.key]} onChange={toggle(item.key)} />
+                <Toggle
+
+  value={
+    item.key === "sendMsg"
+      ? confirmSendMessage
+      : item.key === "makeCalls"
+      ? confirmCalls
+      : item.key === "likeComment"
+      ? confirmLikes
+      : false
+  }
+
+  onChange={
+    item.key === "sendMsg"
+      ? setConfirmSendMessage
+      : item.key === "makeCalls"
+      ? setConfirmCalls
+      : item.key === "likeComment"
+      ? setConfirmLikes
+      : () => {}
+  }
+
+/>
               </div>
             ))}
 
             <p style={{ fontSize: 14, fontWeight: 700, color: "#2D1B69", margin: "16px 0 10px", fontFamily: "system-ui, sans-serif" }}>Confirmation Type:</p>
             {types.map(t => (
-              <button key={t.label} onClick={() => setConfirmType(t.label)}
+              <button key={t.label} onClick={() => setConfirmationType(t.label)}
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: t.color, border: "none", borderRadius: 14, padding: "14px 16px", marginBottom: 10, cursor: "pointer" }}>
                 <div style={{ textAlign: "left" }}>
                   <p style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", margin: "0 0 3px", fontFamily: "system-ui, sans-serif" }}>{t.label}</p>
-                  {confirmType === t.label && <p style={{ fontSize: 12, color: "#5A3A8A", margin: 0, fontFamily: "system-ui, sans-serif" }}>{t.desc}</p>}
+                  {confirmationType === t.label && <p style={{ fontSize: 12, color: "#5A3A8A", margin: 0, fontFamily: "system-ui, sans-serif" }}>{t.desc}</p>}
                 </div>
-                {confirmType === t.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaCheck style={{ color: "currentColor" }} /></span>}
+                {confirmationType === t.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaCheck style={{ color: "currentColor" }} /></span>}
               </button>
             ))}
 
@@ -99,9 +134,9 @@ export default function ConfirmationModeScreen({ onBack }) {
             <span style={{ fontSize: 36, color: "#6B3FA0" }}><FaPhoneAlt style={{ color: "currentColor" }} /></span>
             <p style={{ fontSize: 18, fontWeight: 700, color: "#2D1B69", margin: "12px 0 8px", fontFamily: "system-ui, sans-serif" }}>Call Mummy?</p>
             <p style={{ fontSize: 13, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>
-              {confirmType === "Popup Confirmation" && "Confirm before placing this call."}
-              {confirmType === "Hold-to-confirm" && "Hold YES for 1.5 seconds to confirm."}
-              {confirmType === "Double-tap-confirm" && "Tap YES twice to confirm the call."}
+              {confirmationType === "Popup Confirmation" && "Confirm before placing this call."}
+              {confirmationType === "Hold-to-confirm" && "Hold YES for 1.5 seconds to confirm."}
+              {confirmationType === "Double-tap-confirm" && "Tap YES twice to confirm the call."}
             </p>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
