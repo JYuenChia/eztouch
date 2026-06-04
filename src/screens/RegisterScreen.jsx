@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaUser, FaEnvelope, FaLock, FaCheck } from "react-icons/fa";
 
 const inputStyle = {
   width: "100%",
@@ -33,6 +34,7 @@ const Field = ({ label, icon, type = "text", placeholder, value, onChange, focus
         transform: "translateY(-50%)",
         fontSize: 20,
         pointerEvents: "none",
+        color: "#6B3FA0",
       }}>{icon}</span>
       <input
         type={type}
@@ -107,7 +109,7 @@ export default function RegisterScreen({ onSignUp, onBack }) {
 
         <Field
           label="Username"
-          icon="👤"
+          icon={<FaUser style={{ color: "currentColor" }} />}
           placeholder="Choose a username"
           value={form.username}
           onChange={update("username")}
@@ -119,7 +121,7 @@ export default function RegisterScreen({ onSignUp, onBack }) {
 
         <Field
           label="Email"
-          icon="✉️"
+          icon={<FaEnvelope style={{ color: "currentColor" }} />}
           type="email"
           placeholder="Enter your email"
           value={form.email}
@@ -132,7 +134,7 @@ export default function RegisterScreen({ onSignUp, onBack }) {
 
         <Field
           label="Password"
-          icon="🔒"
+          icon={<FaLock style={{ color: "currentColor" }} />}
           type="password"
           placeholder="Create a password"
           value={form.password}
@@ -145,7 +147,7 @@ export default function RegisterScreen({ onSignUp, onBack }) {
 
         <Field
           label="Confirm Password"
-          icon="🔒"
+          icon={<FaLock style={{ color: "currentColor" }} />}
           type="password"
           placeholder="Repeat your password"
           value={form.confirm}
@@ -182,7 +184,7 @@ export default function RegisterScreen({ onSignUp, onBack }) {
             color: "white",
             transition: "all 0.2s",
           }}>
-            {agreed ? "✓" : ""}
+            {agreed ? <FaCheck style={{ color: "currentColor" }} /> : ""}
           </div>
           <span style={{
             fontSize: 14,

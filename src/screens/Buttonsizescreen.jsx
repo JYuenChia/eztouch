@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowLeft, FaLightbulb, FaCheck } from "react-icons/fa";
 
 const sizes = [
   { label: "Small", desc: "Standard size for users with good finger control", fontSize: 15, inputH: 48, btnH: 48 },
@@ -14,14 +15,14 @@ export default function ButtonSizeScreen({ onBack, currentSize = "Large", onSave
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column" }}>
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Button Size</h1>
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 36px" }}>
         {/* OKU benefit note */}
         <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "12px 16px", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start" }}>
-          <span style={{ fontSize: 20 }}>💡</span>
+          <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaLightbulb style={{ color: "currentColor" }} /></span>
           <p style={{ fontSize: 13, color: "#856404", margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>
             Larger buttons reduce misclicks caused by hand tremors or limited finger reach. We recommend <strong>Large</strong> for users with physical impairments.
           </p>
@@ -43,7 +44,7 @@ export default function ButtonSizeScreen({ onBack, currentSize = "Large", onSave
               <p style={{ fontSize: 12, color: selected === size.label ? "rgba(255,255,255,0.8)" : "#888", margin: 0, fontFamily: "system-ui, sans-serif" }}>{size.desc}</p>
             </div>
             {selected === size.label && (
-              <div style={{ width: 28, height: 28, borderRadius: 14, background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#6B3FA0", fontWeight: 700 }}>✓</div>
+              <div style={{ width: 28, height: 28, borderRadius: 14, background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#6B3FA0", fontWeight: 700 }}><FaCheck style={{ color: "currentColor" }} /></div>
             )}
           </button>
         ))}

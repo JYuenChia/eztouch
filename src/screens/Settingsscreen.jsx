@@ -1,3 +1,5 @@
+import { FaArrowLeft, FaUniversalAccess, FaChevronRight } from "react-icons/fa";
+
 export default function SettingsScreen({ onBack, onButtonSize, onSafeInteraction, onConfirmation, onUndo }) {
   const items = [
     { label: "Button Size", color: "#E8E0F8", textColor: "#2D1B69", onClick: onButtonSize },
@@ -9,14 +11,14 @@ export default function SettingsScreen({ onBack, onButtonSize, onSafeInteraction
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column" }}>
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Setting</h1>
       </div>
 
       <div style={{ flex: 1, padding: "28px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Helper banner */}
         <div style={{ background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", borderRadius: 18, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-          <span style={{ fontSize: 26 }}>♿</span>
+          <span style={{ fontSize: 26, color: "white" }}><FaUniversalAccess style={{ color: "currentColor" }} /></span>
           <p style={{ color: "white", fontSize: 13, margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.4 }}>
             Customise accessibility features to make EzTouch easier and safer for you.
           </p>
@@ -28,7 +30,7 @@ export default function SettingsScreen({ onBack, onButtonSize, onSafeInteraction
             onMouseDown={e => e.currentTarget.style.transform = "scale(0.97)"}
             onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
             <span style={{ fontSize: 19, fontWeight: 700, color: item.textColor, fontFamily: "system-ui, sans-serif", textAlign: "left" }}>{item.label}</span>
-            <span style={{ fontSize: 22, color: "#6B3FA0", fontWeight: 700 }}>›</span>
+            <span style={{ fontSize: 22, color: "#6B3FA0", fontWeight: 700 }}><FaChevronRight style={{ color: "currentColor" }} /></span>
           </button>
         ))}
       </div>

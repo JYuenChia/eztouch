@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowLeft, FaUndo, FaComments, FaTrash, FaHeart, FaUsers, FaCheck, FaFlask } from "react-icons/fa";
 
 function Toggle({ value, onChange }) {
   return (
@@ -33,7 +34,7 @@ export default function UndoSettingScreen({ onBack }) {
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column" }}>
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Undo Setting</h1>
       </div>
 
@@ -41,7 +42,7 @@ export default function UndoSettingScreen({ onBack }) {
 
         {/* OKU benefit */}
         <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "12px 16px", marginBottom: 20, display: "flex", gap: 10 }}>
-          <span style={{ fontSize: 20 }}>↩</span>
+          <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaUndo style={{ color: "currentColor" }} /></span>
           <p style={{ fontSize: 13, color: "#856404", margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>
             Undo lets you quickly cancel an accidental message or action within a set time window — especially helpful when hand tremors cause unexpected sends.
           </p>
@@ -61,14 +62,14 @@ export default function UndoSettingScreen({ onBack }) {
             <p style={{ fontSize: 14, fontWeight: 700, color: "#2D1B69", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>Enable Undo For:</p>
 
             {[
-              { key: "sendMsg", label: "Sending Message", color: "#E8E0F8", icon: "💬" },
-              { key: "deletedMsg", label: "Deleted Messages", color: "#FFE0E8", icon: "🗑️" },
-              { key: "likeComment", label: "Liking/Commenting Posts", color: "#D8F5E8", icon: "❤️" },
-              { key: "groupJoin", label: "Group Join Request", color: "#E0F0FF", icon: "👥" },
+              { key: "sendMsg", label: "Sending Message", color: "#E8E0F8", icon: <FaComments style={{ color: "currentColor" }} /> },
+              { key: "deletedMsg", label: "Deleted Messages", color: "#FFE0E8", icon: <FaTrash style={{ color: "currentColor" }} /> },
+              { key: "likeComment", label: "Liking/Commenting Posts", color: "#D8F5E8", icon: <FaHeart style={{ color: "currentColor" }} /> },
+              { key: "groupJoin", label: "Group Join Request", color: "#E0F0FF", icon: <FaUsers style={{ color: "currentColor" }} /> },
             ].map(item => (
               <div key={item.key} style={{ background: item.color, borderRadius: 14, padding: "12px 16px", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{item.icon}</span>
+                  <span style={{ fontSize: 20, color: "#6B3FA0" }}>{item.icon}</span>
                   <span style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{item.label}</span>
                 </div>
                 <Toggle value={enableFor[item.key]} onChange={toggle(item.key)} />
@@ -83,13 +84,13 @@ export default function UndoSettingScreen({ onBack }) {
                   <p style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", margin: "0 0 2px", fontFamily: "system-ui, sans-serif" }}>{d.label}</p>
                   {duration === d.label && <p style={{ fontSize: 12, color: "#5A3A8A", margin: 0, fontFamily: "system-ui, sans-serif" }}>{d.desc}</p>}
                 </div>
-                {duration === d.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}>☑</span>}
+                {duration === d.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaCheck style={{ color: "currentColor" }} /></span>}
               </button>
             ))}
 
             {/* Live demo */}
             <div style={{ background: "white", borderRadius: 18, padding: "18px", marginTop: 8, boxShadow: "0 2px 10px rgba(107,63,160,0.08)" }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: "#6B3FA0", margin: "0 0 12px", fontFamily: "system-ui, sans-serif" }}>🧪 Try Undo Demo ({duration})</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#6B3FA0", margin: "0 0 12px", fontFamily: "system-ui, sans-serif" }}><FaFlask style={{ color: "currentColor", marginRight: 8 }} />Try Undo Demo ({duration})</p>
 
               {!demoMsg && (
                 <button onClick={tryDemo}
@@ -101,18 +102,18 @@ export default function UndoSettingScreen({ onBack }) {
               {demoMsg && !undid && (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", marginBottom: 10 }}>
-                    <button onClick={() => setUndid(true)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, color: "#6B3FA0" }}>↩</button>
+                    <button onClick={() => setUndid(true)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, color: "#6B3FA0" }}><FaUndo style={{ color: "currentColor" }} /></button>
                     <div style={{ background: "#6B3FA0", color: "white", borderRadius: "20px 20px 4px 20px", padding: "12px 16px", fontSize: 15, fontFamily: "system-ui, sans-serif" }}>{demoMsg}</div>
                   </div>
                   <p style={{ fontSize: 13, color: "#E87030", textAlign: "center", fontFamily: "system-ui, sans-serif", margin: 0 }}>
-                    ↩ Tap the arrow to undo within {duration}
+                    <FaUndo style={{ color: "currentColor", marginRight: 6 }} />Tap the arrow to undo within {duration}
                   </p>
                 </div>
               )}
 
               {demoMsg && undid && (
                 <div style={{ textAlign: "center", padding: "10px 0" }}>
-                  <span style={{ fontSize: 32 }}>✅</span>
+                  <span style={{ fontSize: 32, color: "#4CAF50" }}><FaCheck style={{ color: "currentColor" }} /></span>
                   <p style={{ fontSize: 15, color: "#4CAF50", fontWeight: 700, margin: "8px 0 0", fontFamily: "system-ui, sans-serif" }}>Message undone successfully!</p>
                   <button onClick={() => setDemoMsg(null)} style={{ marginTop: 12, height: 44, padding: "0 24px", borderRadius: 12, background: "#F0EBFF", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>Try Again</button>
                 </div>

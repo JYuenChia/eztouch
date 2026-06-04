@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaHandPaper, FaUser, FaLock, FaEye, FaEyeSlash, FaUniversalAccess } from "react-icons/fa";
 
 const inputStyle = {
   width: "100%",
@@ -22,6 +23,7 @@ const iconWrap = {
   transform: "translateY(-50%)",
   fontSize: 22,
   pointerEvents: "none",
+  color: "#6B3FA0",
 };
 
 export default function LoginScreen({ onLogin, onRegister }) {
@@ -58,7 +60,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
           justifyContent: "center",
           margin: "0 auto 16px",
           fontSize: 30,
-        }}>🤚</div>
+        }}><FaHandPaper style={{ color: "currentColor" }} /></div>
         <h1 style={{
           color: "white",
           fontSize: 32,
@@ -88,7 +90,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
             fontFamily: "system-ui, sans-serif",
           }}>Username</label>
           <div style={{ position: "relative" }}>
-            <span style={iconWrap}>👤</span>
+            <span style={iconWrap}><FaUser style={{ color: "currentColor" }} /></span>
             <input
               type="text"
               placeholder="Enter your username"
@@ -115,7 +117,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
             fontFamily: "system-ui, sans-serif",
           }}>Password</label>
           <div style={{ position: "relative" }}>
-            <span style={iconWrap}>🔒</span>
+            <span style={iconWrap}><FaLock style={{ color: "currentColor" }} /></span>
             <input
               type={showPass ? "text" : "password"}
               placeholder="Enter your password"
@@ -142,7 +144,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
                 fontSize: 20,
                 padding: 4,
               }}
-            >{showPass ? "🙈" : "👁️"}</button>
+            >{showPass ? <FaEyeSlash style={{ color: "currentColor" }} /> : <FaEye style={{ color: "currentColor" }} />}</button>
           </div>
         </div>
 
@@ -217,7 +219,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
           alignItems: "center",
           gap: 10,
         }}>
-          <span style={{ fontSize: 22 }}>♿</span>
+          <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaUniversalAccess style={{ color: "currentColor" }} /></span>
           <p style={{
             margin: 0,
             fontSize: 13,

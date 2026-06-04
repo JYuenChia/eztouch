@@ -1,12 +1,14 @@
+import { FaArrowLeft, FaUser, FaPlus } from "react-icons/fa";
+
 // Use `contacts` prop supplied by the app; fall back to defaults
 const defaultContacts = {
   recent: [
-    { id: 1, name: "Boyfriend", avatar: "🧍", unread: 5, color: "#C4A882" },
+    { id: 1, name: "Boyfriend", avatar: <FaUser style={{ color: "currentColor" }} />, unread: 5, color: "#C4A882" },
   ],
   others: [
-    { id: 2, name: "Mummy", avatar: "👩", unread: 9, color: "#E8A0A0" },
-    { id: 3, name: "Xiao Mei", avatar: "👧", unread: 0, color: "#F0C0B0" },
-    { id: 4, name: "Alice", avatar: "👱‍♀️", unread: 0, color: "#A0C8A0" },
+    { id: 2, name: "Mummy", avatar: <FaUser style={{ color: "currentColor" }} />, unread: 9, color: "#E8A0A0" },
+    { id: 3, name: "Xiao Mei", avatar: <FaUser style={{ color: "currentColor" }} />, unread: 0, color: "#F0C0B0" },
+    { id: 4, name: "Alice", avatar: <FaUser style={{ color: "currentColor" }} />, unread: 0, color: "#A0C8A0" },
   ],
 };
 
@@ -38,6 +40,7 @@ function ContactRow({ contact, onClick }) {
         height: 54,
         borderRadius: 27,
         background: contact.color,
+        color: "white",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -107,7 +110,7 @@ export default function ChatList({ onBack, onOpenChat, contacts = defaultContact
           cursor: "pointer",
           color: "#6B3FA0",
           padding: 4,
-        }}>←</button>
+        }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{
           fontSize: 28,
           fontWeight: 700,
@@ -162,7 +165,7 @@ export default function ChatList({ onBack, onOpenChat, contacts = defaultContact
         alignItems: "center",
         justifyContent: "center",
         boxShadow: "0 4px 16px rgba(107,63,160,0.4)",
-      }}>+</button>
+      }}><FaPlus style={{ color: "currentColor" }} /></button>
     </div>
   );
 }

@@ -1,29 +1,31 @@
+import { FaComments, FaHandsHelping, FaUser, FaCog, FaHandPaper } from "react-icons/fa";
+
 export default function HomeDashboard({ onChat, onCommunity, onProfile, onSettings }) {
   const tiles = [
     {
       label: "Open Chat",
-      icon: "💬",
+      icon: <FaComments style={{ color: "currentColor" }} />,
       color: "#B8B0E8",
       iconBg: "#9B91D4",
       onClick: onChat,
     },
     {
       label: "Community",
-      icon: "🤝",
+      icon: <FaHandsHelping style={{ color: "currentColor" }} />,
       color: "#F5C4A0",
       iconBg: "#F0A06A",
       onClick: onCommunity,
     },
     {
       label: "Profile",
-      icon: "👤",
+      icon: <FaUser style={{ color: "currentColor" }} />,
       color: "#F5A8A8",
       iconBg: "#E87070",
       onClick: onProfile,
     },
     {
       label: "Setting",
-      icon: "⚙️",
+      icon: <FaCog style={{ color: "currentColor" }} />,
       color: "#90C8C8",
       iconBg: "#5AABAB",
       onClick: onSettings,
@@ -49,7 +51,7 @@ export default function HomeDashboard({ onChat, onCommunity, onProfile, onSettin
           fontSize: 14,
           margin: "0 0 4px",
           fontFamily: "system-ui, sans-serif",
-        }}>Good morning 👋</p>
+        }}>Good morning <FaHandPaper style={{ color: "currentColor", fontSize: "1em", verticalAlign: "-0.08em" }} /></p>
         <h1 style={{
           color: "white",
           fontSize: 26,
@@ -111,6 +113,7 @@ export default function HomeDashboard({ onChat, onCommunity, onProfile, onSettin
               justifyContent: "center",
               fontSize: 26,
               flexShrink: 0,
+              color: "white",
             }}>
               {tile.icon}
             </div>

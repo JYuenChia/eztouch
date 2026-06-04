@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowLeft, FaShieldAlt, FaComments, FaHeart, FaPhoneAlt, FaCheck, FaFlask } from "react-icons/fa";
 
 function Toggle({ value, onChange }) {
   return (
@@ -27,7 +28,7 @@ export default function ConfirmationModeScreen({ onBack }) {
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column", position: "relative" }}>
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Confirmation Mode</h1>
       </div>
 
@@ -35,7 +36,7 @@ export default function ConfirmationModeScreen({ onBack }) {
 
         {/* OKU benefit */}
         <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "12px 16px", marginBottom: 20, display: "flex", gap: 10 }}>
-          <span style={{ fontSize: 20 }}>🛡️</span>
+          <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaShieldAlt style={{ color: "currentColor" }} /></span>
           <p style={{ fontSize: 13, color: "#856404", margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>
             Confirmation Mode prevents social embarrassment by asking you to verify before sending messages, making calls, or liking posts — protecting against accidental actions.
           </p>
@@ -55,13 +56,13 @@ export default function ConfirmationModeScreen({ onBack }) {
             <p style={{ fontSize: 14, fontWeight: 700, color: "#2D1B69", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>List of actions covered by confirmation:</p>
 
             {[
-              { key: "sendMsg", label: "Sending Message", color: "#E8E0F8", icon: "💬" },
-              { key: "likeComment", label: "Liking/Commenting Posts", color: "#FFE0E8", icon: "❤️" },
-              { key: "makeCalls", label: "Making Calls", color: "#D8F5E8", icon: "📞" },
+              { key: "sendMsg", label: "Sending Message", color: "#E8E0F8", icon: <FaComments style={{ color: "currentColor" }} /> },
+              { key: "likeComment", label: "Liking/Commenting Posts", color: "#FFE0E8", icon: <FaHeart style={{ color: "currentColor" }} /> },
+              { key: "makeCalls", label: "Making Calls", color: "#D8F5E8", icon: <FaPhoneAlt style={{ color: "currentColor" }} /> },
             ].map(item => (
               <div key={item.key} style={{ background: item.color, borderRadius: 14, padding: "12px 16px", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{item.icon}</span>
+                  <span style={{ fontSize: 20, color: "#6B3FA0" }}>{item.icon}</span>
                   <span style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{item.label}</span>
                 </div>
                 <Toggle value={actions[item.key]} onChange={toggle(item.key)} />
@@ -76,14 +77,14 @@ export default function ConfirmationModeScreen({ onBack }) {
                   <p style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", margin: "0 0 3px", fontFamily: "system-ui, sans-serif" }}>{t.label}</p>
                   {confirmType === t.label && <p style={{ fontSize: 12, color: "#5A3A8A", margin: 0, fontFamily: "system-ui, sans-serif" }}>{t.desc}</p>}
                 </div>
-                {confirmType === t.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}>☑</span>}
+                {confirmType === t.label && <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaCheck style={{ color: "currentColor" }} /></span>}
               </button>
             ))}
 
             {/* Try it demo */}
             <button onClick={() => setShowDemo(true)}
               style={{ width: "100%", height: 56, borderRadius: 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginTop: 8, boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
-              🧪 Try Confirmation Demo
+              <FaFlask style={{ color: "currentColor", marginRight: 8 }} /> Try Confirmation Demo
             </button>
           </>
         )}
@@ -93,7 +94,7 @@ export default function ConfirmationModeScreen({ onBack }) {
       {showDemo && (
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
           <div style={{ background: "white", borderRadius: 24, padding: "28px 24px", width: "82%", textAlign: "center" }}>
-            <span style={{ fontSize: 36 }}>📞</span>
+            <span style={{ fontSize: 36, color: "#6B3FA0" }}><FaPhoneAlt style={{ color: "currentColor" }} /></span>
             <p style={{ fontSize: 18, fontWeight: 700, color: "#2D1B69", margin: "12px 0 8px", fontFamily: "system-ui, sans-serif" }}>Call Mummy?</p>
             <p style={{ fontSize: 13, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>
               {confirmType === "Popup Confirmation" && "Confirm before placing this call."}
@@ -102,7 +103,7 @@ export default function ConfirmationModeScreen({ onBack }) {
             </p>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: 52, borderRadius: 14, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => { alert("✅ Action confirmed!"); setShowDemo(false); }} style={{ flex: 1, height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>YES</button>
+              <button onClick={() => { alert("✅ Action confirmed!"); setShowDemo(false); }} style={{ flex: 1, height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES</button>
             </div>
           </div>
         </div>

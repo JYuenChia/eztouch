@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { FaArrowLeft, FaUser, FaUserPlus, FaPlus } from "react-icons/fa";
 
 export default function AddContactScreen({ onBack, onAdded }) {
   const [name, setName] = useState("");
@@ -24,7 +25,7 @@ export default function AddContactScreen({ onBack, onAdded }) {
 
       {/* Header */}
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8" }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Add Contact</h1>
       </div>
 
@@ -32,8 +33,8 @@ export default function AddContactScreen({ onBack, onAdded }) {
         {/* Avatar placeholder */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
           <div style={{ position: "relative" }}>
-            <div style={{ width: 90, height: 90, borderRadius: 45, background: "#D0C0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>👤</div>
-            <div style={{ position: "absolute", bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, background: "#6B3FA0", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, fontWeight: 700 }}>+</div>
+            <div style={{ width: 90, height: 90, borderRadius: 45, background: "#D0C0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, color: "white" }}><FaUser style={{ color: "currentColor" }} /></div>
+            <div style={{ position: "absolute", bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, background: "#6B3FA0", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, fontWeight: 700 }}><FaPlus style={{ color: "currentColor", fontSize: 12 }} /></div>
           </div>
         </div>
 
@@ -52,7 +53,7 @@ export default function AddContactScreen({ onBack, onAdded }) {
         {/* Add Contact button */}
         <button onClick={() => { if (name && phone) setShowConfirm(true); else alert("Please fill in all fields."); }}
           style={{ width: "100%", height: 62, borderRadius: 18, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 14, boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>
-          <span style={{ fontSize: 22 }}>🧑‍🤝‍🧑</span> Add Contact
+          <span style={{ fontSize: 22, color: "#6B3FA0" }}><FaUserPlus style={{ color: "currentColor" }} /></span> Add Contact
         </button>
 
         {/* Cancel button */}
@@ -75,7 +76,7 @@ export default function AddContactScreen({ onBack, onAdded }) {
                   id: Date.now(),
                   name,
                   phone,
-                  avatar: "👤",
+                  avatar: <FaUser style={{ color: "currentColor" }} />,
                   color: "#D0C0F0",
                   unread: 0,
                 };

@@ -102,7 +102,7 @@ export default function PostPreviewScreen({ postText, postImage, onBack, onPost 
           onClick={onBack}
           style={{ flex: 1, height: 60, borderRadius: 20, background: "#F0EBF8", color: "#6B3FA0", border: "2px solid #D0B8F5", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
         >
-          ← Edit Post
+          <FaArrowLeft style={{ color: "currentColor", marginRight: 8 }} /> Edit Post
         </button>
         <button
           onClick={handlePost}

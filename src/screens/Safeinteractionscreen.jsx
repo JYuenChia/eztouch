@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowLeft, FaHandPaper, FaFlask, FaCheck } from "react-icons/fa";
 
 function Toggle({ value, onChange }) {
   return (
@@ -27,7 +28,7 @@ function RadioRow({ label, selected, onSelect, color }) {
     <button onClick={onSelect}
       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: color, border: "none", borderRadius: 14, padding: "14px 16px", marginBottom: 10, cursor: "pointer" }}>
       <span style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{label}</span>
-      {selected && <span style={{ fontSize: 20, color: "#6B3FA0" }}>☑</span>}
+      {selected && <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaCheck style={{ color: "currentColor" }} /></span>}
     </button>
   );
 }
@@ -48,7 +49,7 @@ export default function SafeInteractionScreen({ onBack }) {
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column" }}>
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}>←</button>
+        <button onClick={onBack} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0" }}><FaArrowLeft style={{ color: "currentColor" }} /></button>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Safe Interaction Mode</h1>
       </div>
 
@@ -56,7 +57,7 @@ export default function SafeInteractionScreen({ onBack }) {
 
         {/* OKU benefit */}
         <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "12px 16px", marginBottom: 20, display: "flex", gap: 10 }}>
-          <span style={{ fontSize: 20 }}>🤚</span>
+          <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaHandPaper style={{ color: "currentColor" }} /></span>
           <p style={{ fontSize: 13, color: "#856404", margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>
             Safe Interaction Mode prevents accidental taps caused by hand tremors or involuntary movements. Enable long press or double press to avoid unwanted actions.
           </p>
@@ -90,7 +91,7 @@ export default function SafeInteractionScreen({ onBack }) {
 
             {/* Demo box */}
             <div style={{ background: "white", borderRadius: 18, padding: 18, marginTop: 8, boxShadow: "0 2px 10px rgba(107,63,160,0.08)" }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: "#6B3FA0", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>🧪 Currently active: {style}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#6B3FA0", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}><FaFlask style={{ color: "currentColor", marginRight: 8 }} />Currently active: {style}</p>
               <p style={{ fontSize: 12, color: "#555", margin: 0, fontFamily: "system-ui, sans-serif", lineHeight: 1.5 }}>
                 {style === "Normal Touch" && "Standard tap interaction. Accidental taps may still occur."}
                 {style === "Long Press" && "Hold for 1 second to confirm any action. Best for severe tremors."}
