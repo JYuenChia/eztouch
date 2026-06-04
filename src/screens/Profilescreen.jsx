@@ -7,8 +7,10 @@ import {
   FaCalendarAlt,
   FaEdit,
 } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 export default function ProfileScreen({ onBack, onEdit }) {
+  const { sz } = useSizeContext();
   const [profile] = useState({
     username: "Username",
     email: "user@example.com",
@@ -153,13 +155,13 @@ export default function ProfileScreen({ onBack, onEdit }) {
           onClick={onEdit}
           style={{
             width: "100%",
-            height: 62,
-            borderRadius: 18,
+            height: sz.height,
+            borderRadius: sz.borderRadius,
             background: "#6B3FA0",
             color: "white",
             border: "none",
             cursor: "pointer",
-            fontSize: 19,
+            fontSize: sz.fontSize,
             fontWeight: 700,
             fontFamily: "system-ui, sans-serif",
             boxShadow: "0 6px 20px rgba(107,63,160,0.3)",

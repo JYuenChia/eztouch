@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { FaUser, FaGlassCheers, FaSmile, FaHandshake, FaHands, FaLifeRing, FaClock, FaPray, FaThumbsUp, FaComment, FaCat, FaHeart, FaArrowLeft, FaCog, FaUndo, FaMicrophone, FaLightbulb, FaPaperPlane, FaBroadcastTower, FaMagic, FaExclamationTriangle, FaSignOutAlt } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 const MEMBERS = [
   { id: 1, name: "Anna", avatar: <FaUser />, color: "#E8A0A0" },
@@ -33,6 +34,7 @@ const quickReplies = [
 ];
 
 export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
+  const { sz } = useSizeContext();
   const [messages, setMessages] = useState(() => getInitMessages(group));
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main");
@@ -295,8 +297,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
               style={{ width: "100%", boxSizing: "border-box", background: "white", borderRadius: 14, padding: "12px 16px", fontSize: 17, fontWeight: "bold", color: "#2D1B69", fontFamily: "system-ui, sans-serif", marginBottom: 16, border: "2px solid #D0B8F5", lineHeight: 1.4, outline: "none", resize: "none" }}
             />
             <div style={{ display: "flex", gap: 16 }}>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: 54, borderRadius: 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: 54, borderRadius: 16, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND TO GROUP</button>
+              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND TO GROUP</button>
             </div>
           </div>
         )}
@@ -313,7 +315,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                 <button
                   key={r.label}
                   onClick={() => sendMessage(r.label)}
-                  style={{ height: 54, borderRadius: 24, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
+                  style={{ height: sz.height, borderRadius: sz.borderRadius, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
                 >
                   {r.label}
                 </button>
@@ -374,10 +376,10 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
             <button
               onClick={() => setLeaveConfirm(true)}
               style={{
-                width: "100%", height: 54, borderRadius: 18,
+                width: "100%", height: sz.height, borderRadius: sz.borderRadius,
                 border: "2px solid #E83030", background: "#FFF5F5",
                 color: "#E83030", cursor: "pointer",
-                fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif",
+                fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 flexShrink: 0,
               }}
@@ -406,13 +408,13 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
                   setShowMembersModal(false);
                   if (onLeaveGroup) onLeaveGroup(group?.id);
                 }}
-                style={{ width: "100%", height: 58, borderRadius: 20, background: "#E83030", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(232,48,48,0.3)" }}
+                style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#E83030", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(232,48,48,0.3)" }}
               >
                 Yes, Leave Group
               </button>
               <button
                 onClick={() => setLeaveConfirm(false)}
-                style={{ width: "100%", height: 58, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+                style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Cancel
               </button>

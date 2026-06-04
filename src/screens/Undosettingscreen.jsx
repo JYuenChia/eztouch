@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaArrowLeft, FaUndo, FaComments, FaTrash, FaHeart, FaUsers, FaCheck, FaFlask } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 function Toggle({ value, onChange }) {
   return (
@@ -18,6 +19,7 @@ const durations = [
 ];
 
 export default function UndoSettingScreen({ onBack }) {
+  const { sz } = useSizeContext();
   const [undoOn, setUndoOn] = useState(true);
   const [enableFor, setEnableFor] = useState({ sendMsg: true, deletedMsg: false, likeComment: true, groupJoin: true });
   const [duration, setDuration] = useState("60 Seconds");
@@ -94,7 +96,7 @@ export default function UndoSettingScreen({ onBack }) {
 
               {!demoMsg && (
                 <button onClick={tryDemo}
-                  style={{ width: "100%", height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
+                  style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
                   Simulate Accidental Send
                 </button>
               )}
@@ -115,7 +117,7 @@ export default function UndoSettingScreen({ onBack }) {
                 <div style={{ textAlign: "center", padding: "10px 0" }}>
                   <span style={{ fontSize: 32, color: "#4CAF50" }}><FaCheck style={{ color: "currentColor" }} /></span>
                   <p style={{ fontSize: 15, color: "#4CAF50", fontWeight: 700, margin: "8px 0 0", fontFamily: "system-ui, sans-serif" }}>Message undone successfully!</p>
-                  <button onClick={() => setDemoMsg(null)} style={{ marginTop: 12, height: 44, padding: "0 24px", borderRadius: 12, background: "#F0EBFF", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>Try Again</button>
+                  <button onClick={() => setDemoMsg(null)} style={{ marginTop: 12, height: sz.height, padding: "0 24px", borderRadius: sz.borderRadius, background: "#F0EBFF", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>Try Again</button>
                 </div>
               )}
             </div>

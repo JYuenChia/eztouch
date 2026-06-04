@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaArrowLeft, FaShieldAlt, FaComments, FaHeart, FaPhoneAlt, FaCheck, FaFlask } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 function Toggle({ value, onChange }) {
   return (
@@ -12,6 +13,7 @@ function Toggle({ value, onChange }) {
 }
 
 export default function ConfirmationModeScreen({ onBack }) {
+  const { sz } = useSizeContext();
   const [master, setMaster] = useState(true);
   const [actions, setActions] = useState({ sendMsg: true, likeComment: false, makeCalls: true });
   const [confirmType, setConfirmType] = useState("Popup Confirmation");
@@ -83,7 +85,7 @@ export default function ConfirmationModeScreen({ onBack }) {
 
             {/* Try it demo */}
             <button onClick={() => setShowDemo(true)}
-              style={{ width: "100%", height: 56, borderRadius: 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginTop: 8, boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
+              style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginTop: 8, boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
               <FaFlask style={{ color: "currentColor", marginRight: 8 }} /> Try Confirmation Demo
             </button>
           </>
@@ -102,8 +104,8 @@ export default function ConfirmationModeScreen({ onBack }) {
               {confirmType === "Double-tap-confirm" && "Tap YES twice to confirm the call."}
             </p>
             <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: 52, borderRadius: 14, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => { alert("✅ Action confirmed!"); setShowDemo(false); }} style={{ flex: 1, height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES</button>
+              <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <button onClick={() => { alert("✅ Action confirmed!"); setShowDemo(false); }} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES</button>
             </div>
           </div>
         </div>

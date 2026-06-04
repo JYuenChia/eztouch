@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 export default function EditProfileScreen({ onBack, onSaved }) {
+  const { sz } = useSizeContext();
   const [form, setForm] = useState({ username: "Username", email: "user@example.com", phone: "+123 456 7890", bio: "" });
   const [focused, setFocused] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -57,11 +59,11 @@ export default function EditProfileScreen({ onBack, onSaved }) {
 
         <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
           <button onClick={() => setShowSuccess(true)}
-            style={{ flex: 1, height: 58, borderRadius: 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
+            style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
             Save
           </button>
           <button onClick={onBack}
-            style={{ flex: 1, height: 58, borderRadius: 16, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
+            style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
             Cancel
           </button>
         </div>
@@ -74,11 +76,11 @@ export default function EditProfileScreen({ onBack, onSaved }) {
             <p style={{ fontSize: 18, fontWeight: 700, color: "#2D1B69", marginBottom: 6, fontFamily: "system-ui, sans-serif" }}>Profile updated successfully!</p>
             <p style={{ fontSize: 14, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Your changes have been saved.</p>
             <button onClick={() => { setShowSuccess(false); onSaved && onSaved(); }}
-              style={{ width: "100%", height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginBottom: 10 }}>
+              style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginBottom: 10 }}>
               OK
             </button>
             <button onClick={() => setShowSuccess(false)}
-              style={{ width: "100%", height: 52, borderRadius: 14, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
+              style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
               UNDO
             </button>
           </div>

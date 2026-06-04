@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SizeProvider } from "./context/SizeContext";
 import SplashScreen from "./screens/SplashScreen";
 import { FaCat, FaGraduationCap, FaHandsHelping, FaBook, FaUser } from "react-icons/fa";
 import LoginScreen from "./screens/LoginScreen";
@@ -68,6 +69,7 @@ export default function App() {
   };
 
   return (
+    <SizeProvider>
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#1a1a2e" }}>
       <div style={{ width: 390, height: 844, borderRadius: 44, overflow: "hidden", position: "relative", boxShadow: "0 0 0 10px #111, 0 0 0 12px #333", background: "#fff" }}>
 
@@ -115,12 +117,13 @@ export default function App() {
 
         {/* ── Settings Module ── */}
         {screen === "settings" && <SettingsScreen onBack={() => go("home")} onButtonSize={() => go("buttonsize")} onSafeInteraction={() => go("safeinteraction")} onConfirmation={() => go("confirmation")} onUndo={() => go("undosetting")} />}
-        {screen === "buttonsize" && <ButtonSizeScreen onBack={() => go("settings")} onSave={() => {}} />}
+        {screen === "buttonsize" && <ButtonSizeScreen onBack={() => go("settings")} />}
         {screen === "safeinteraction" && <SafeInteractionScreen onBack={() => go("settings")} />}
         {screen === "confirmation" && <ConfirmationModeScreen onBack={() => go("settings")} />}
         {screen === "undosetting" && <UndoSettingScreen onBack={() => go("settings")} />}
 
       </div>
     </div>
+    </SizeProvider>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaHandPaper, FaUser, FaLock, FaEye, FaEyeSlash, FaUniversalAccess } from "react-icons/fa";
+import { useSizeContext } from "../context/SizeContext";
 
 const inputStyle = {
   width: "100%",
@@ -27,6 +28,7 @@ const iconWrap = {
 };
 
 export default function LoginScreen({ onLogin, onRegister }) {
+  const { sz } = useSizeContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -166,11 +168,11 @@ export default function LoginScreen({ onLogin, onRegister }) {
           onClick={onLogin}
           style={{
             width: "100%",
-            height: 64,
-            borderRadius: 18,
+            height: sz.height,
+            borderRadius: sz.borderRadius,
             background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)",
             color: "white",
-            fontSize: 20,
+            fontSize: sz.fontSize,
             fontWeight: 700,
             border: "none",
             cursor: "pointer",
@@ -191,11 +193,11 @@ export default function LoginScreen({ onLogin, onRegister }) {
           onClick={onRegister}
           style={{
             width: "100%",
-            height: 64,
-            borderRadius: 18,
+            height: sz.height,
+            borderRadius: sz.borderRadius,
             background: "white",
             color: "#6B3FA0",
-            fontSize: 20,
+            fontSize: sz.fontSize,
             fontWeight: 700,
             border: "2px solid #D0B8F5",
             cursor: "pointer",
