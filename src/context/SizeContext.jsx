@@ -94,6 +94,24 @@ export function SizeProvider({ children }) {
 
   const [confirmLikes, setConfirmLikes] =
   useState(false);
+  const [undoOn, setUndoOn] =
+useState(true);
+
+const [undoSendMessage, setUndoSendMessage] =
+useState(true);
+
+const [undoDeleteMessage, setUndoDeleteMessage] =
+useState(false);
+
+const [undoLikeComment, setUndoLikeComment] =
+useState(true);
+
+const [undoGroupJoin, setUndoGroupJoin] =
+useState(true);
+
+const [undoDuration, setUndoDuration] =
+useState("10 Seconds");
+
   // =========================
   // LOAD SAVED SETTINGS
   // =========================
@@ -146,6 +164,31 @@ export function SizeProvider({ children }) {
       setConfirmLikes(
   savedSettings.confirmLikes ?? false
 );
+    setUndoOn(
+savedSettings.undoOn ?? true
+);
+
+setUndoSendMessage(
+savedSettings.undoSendMessage ?? true
+);
+
+setUndoDeleteMessage(
+savedSettings.undoDeleteMessage ?? false
+);
+
+setUndoLikeComment(
+savedSettings.undoLikeComment ?? true
+);
+
+setUndoGroupJoin(
+savedSettings.undoGroupJoin ?? true
+);
+
+setUndoDuration(
+savedSettings.undoDuration ??
+"10 Seconds"
+);
+
     }
 
   }, []);
@@ -172,6 +215,13 @@ export function SizeProvider({ children }) {
         confirmCalls,
         confirmationType,
         confirmLikes,
+        undoOn,
+        undoSendMessage,
+        undoDeleteMessage,
+        undoLikeComment,
+        undoGroupJoin,
+        undoDuration,
+
       })
     );
 
@@ -188,7 +238,12 @@ export function SizeProvider({ children }) {
     confirmCalls,
     confirmationType,
     confirmLikes,
-
+    undoOn,
+    undoSendMessage,
+    undoDeleteMessage,
+    undoLikeComment,
+    undoGroupJoin,
+    undoDuration,
   ]);
 
   return (
@@ -232,6 +287,25 @@ export function SizeProvider({ children }) {
 
         confirmLikes,
         setConfirmLikes,
+
+        undoOn,
+        setUndoOn,
+
+        undoSendMessage,
+        setUndoSendMessage,
+
+        undoDeleteMessage,
+        setUndoDeleteMessage,
+
+        undoLikeComment,
+        setUndoLikeComment,
+
+        undoGroupJoin,
+        setUndoGroupJoin,
+
+        undoDuration,
+        setUndoDuration,
+
       }}
     >
       {children}
