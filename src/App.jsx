@@ -45,8 +45,20 @@ export default function App() {
     { id: 3, name: "Helping Each Other", avatar: <FaHandsHelping />, color: "#F5A0A0", unread: 0, members: 18 },
     { id: 4, name: "Class 2025", avatar: <FaBook />, color: "#A0D0E8", unread: 0, members: 14 },
   ]);
+  const [customGroups, setCustomGroups] = useState([]);
 
   const leaveGroup = (groupId) => setMyGroups(prev => prev.filter(g => g.id !== groupId));
+  const deleteGroup = (groupId) => {
+    setCustomGroups(prev => prev.filter(g => g.id !== groupId));
+    setMyGroups(prev => prev.filter(g => g.id !== groupId));
+  };
+  const editGroup = (updatedGroup) => {
+    setCustomGroups(prev => prev.map(g => g.id === updatedGroup.id ? updatedGroup : g));
+    setMyGroups(prev => prev.map(g => g.id === updatedGroup.id ? { ...g, ...updatedGroup, avatar: updatedGroup.icon } : g));
+    if (selectedGroup?.id === updatedGroup.id) {
+      setSelectedGroup(prev => ({ ...prev, ...updatedGroup, avatar: updatedGroup.icon }));
+    }
+  };
   const [contacts, setContacts] = useState({
     recent: [
       { id: 1, name: "Boyfriend", avatar: <FaUser />, unread: 5, color: "#C4A882" },
@@ -116,8 +128,18 @@ export default function App() {
         {screen === "community" && <CommunityScreen onBack={() => go("home")} onCreatePost={() => go("createpost")} onJoinGroup={() => go("joingroup")} onOpenGroup={(g) => { setSelectedGroup(g); setCommunityTab("mygroup"); go("groupchat"); }} defaultTab={communityTab} myGroups={myGroups} posts={posts} setPosts={setPosts} />}
         {screen === "createpost" && <CreatePostScreen onBack={() => { setCommunityTab("discover"); go("community"); }} onNext={(text, image) => { setPostText(text); setPostImage(image); go("postpreview"); }} />}
         {screen === "postpreview" && <PostPreviewScreen postText={postText} postImage={postImage} onBack={() => go("createpost")} onPost={handlePost} />}
-        {screen === "joingroup" && <JoinGroupScreen onBack={() => { setCommunityTab("mygroup"); go("community"); }} onJoinedGroup={(group) => { setMyGroups(prev => [...prev, { ...group, isNew: true }]); setCommunityTab("mygroup"); go("community"); }} />}
-        {screen === "groupchat" && <GroupChatScreen group={selectedGroup} onBack={() => go("community")} onLeaveGroup={(id) => { leaveGroup(id); go("community"); }} />}
+        {screen === "joingroup" && <JoinGroupScreen 
+          customGroups={customGroups}
+          onBack={() => { setCommunityTab("mygroup"); go("community"); }} 
+          onJoinedGroup={(group) => { setMyGroups(prev => [...prev, { ...group, isNew: true }]); setCommunityTab("mygroup"); go("community"); }} 
+          onCreateGroup={(group) => { 
+            setCustomGroups(prev => [...prev, group]); 
+            setMyGroups(prev => [...prev, { ...group, unread: 0, avatar: group.icon, isNew: true, isCreator: true }]); 
+            setCommunityTab("mygroup"); 
+            go("community"); 
+          }}
+        />}
+        {screen === "groupchat" && <GroupChatScreen group={selectedGroup} onBack={() => go("community")} onLeaveGroup={(id) => { leaveGroup(id); go("community"); }} onDeleteGroup={(id) => { deleteGroup(id); go("community"); }} onEditGroup={editGroup} />}
 
         {/* ── Profile Module ── */}
         {screen === "profile" && <ProfileScreen profile={currentUser} onBack={() => go("home")} onEdit={() => go("editprofile")} />}
