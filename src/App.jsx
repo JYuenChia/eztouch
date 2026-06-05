@@ -23,6 +23,16 @@ import UndoSettingScreen from "./screens/Undosettingscreen";
 
 export default function App() {
   const [screen, setScreen] = useState("splash");
+  const [currentUser, setCurrentUser] = useState(() => {
+    const session = localStorage.getItem("eztouch_session");
+    return session ? JSON.parse(session) : {
+      username: "Username",
+      email: "user@example.com",
+      phone: "+123 456 7890",
+      joined: "January 15, 2021",
+      bio: ""
+    };
+  });
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [postText, setPostText] = useState("");
@@ -72,7 +82,7 @@ export default function App() {
       <div style={{ width: 390, height: 844, borderRadius: 44, overflow: "hidden", position: "relative", boxShadow: "0 0 0 10px #111, 0 0 0 12px #333", background: "#fff" }}>
 
         {screen === "splash" && <SplashScreen onNext={() => go("login")} />}
-        {screen === "login" && <LoginScreen onLogin={() => go("home")} onRegister={() => go("register")} />}
+        {screen === "login" && <LoginScreen onLogin={(user) => { setCurrentUser(user); go("home"); }} onRegister={() => go("register")} />}
         {screen === "register" && <RegisterScreen onSignUp={() => go("login")} onBack={() => go("login")} />}
 
         {screen === "home" && (
@@ -110,8 +120,8 @@ export default function App() {
         {screen === "groupchat" && <GroupChatScreen group={selectedGroup} onBack={() => go("community")} onLeaveGroup={(id) => { leaveGroup(id); go("community"); }} />}
 
         {/* ── Profile Module ── */}
-        {screen === "profile" && <ProfileScreen onBack={() => go("home")} onEdit={() => go("editprofile")} />}
-        {screen === "editprofile" && <EditProfileScreen onBack={() => go("profile")} onSaved={() => go("profile")} />}
+        {screen === "profile" && <ProfileScreen profile={currentUser} onBack={() => go("home")} onEdit={() => go("editprofile")} />}
+        {screen === "editprofile" && <EditProfileScreen profile={currentUser} onBack={() => go("profile")} onSaved={(updatedUser) => { setCurrentUser(updatedUser); go("profile"); }} />}
 
         {/* ── Settings Module ── */}
         {screen === "settings" && <SettingsScreen onBack={() => go("home")} onButtonSize={() => go("buttonsize")} onSafeInteraction={() => go("safeinteraction")} onConfirmation={() => go("confirmation")} onUndo={() => go("undosetting")} />}

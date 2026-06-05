@@ -32,6 +32,26 @@ export default function LoginScreen({ onLogin, onRegister }) {
   const [showPass, setShowPass] = useState(false);
   const [focused, setFocused] = useState("");
 
+  const handleLogin = () => {
+    if (!username || !password) {
+      alert("⚠️ Please enter username and password.");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("eztouch_users") || "[]");
+    const matchedUser = users.find(
+      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+    );
+
+    if (!matchedUser) {
+      alert("⚠️ Invalid username or password.");
+      return;
+    }
+
+    localStorage.setItem("eztouch_session", JSON.stringify(matchedUser));
+    onLogin(matchedUser);
+  };
+
   return (
     <div style={{
       width: "100%",
@@ -163,7 +183,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
 
         {/* Login button */}
         <button
-          onClick={onLogin}
+          onClick={handleLogin}
           style={{
             width: "100%",
             height: 64,

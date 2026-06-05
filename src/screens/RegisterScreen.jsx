@@ -68,6 +68,33 @@ export default function RegisterScreen({ onSignUp, onBack }) {
       alert("⚠️ Passwords do not match.");
       return;
     }
+    if (!agreed) {
+      alert("⚠️ You must agree to the Terms of Service and Privacy Policy.");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("eztouch_users") || "[]");
+    if (users.some(u => u.username.toLowerCase() === form.username.toLowerCase())) {
+      alert("⚠️ Username is already taken.");
+      return;
+    }
+    if (users.some(u => u.email.toLowerCase() === form.email.toLowerCase())) {
+      alert("⚠️ Email is already registered.");
+      return;
+    }
+
+    const newUser = {
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      phone: "+123 456 7890",
+      joined: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      bio: ""
+    };
+
+    users.push(newUser);
+    localStorage.setItem("eztouch_users", JSON.stringify(users));
+    alert("🎉 Registration successful! Please log in.");
     onSignUp();
   };
 

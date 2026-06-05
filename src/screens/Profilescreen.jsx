@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   FaArrowLeft,
   FaUserCircle,
@@ -8,13 +7,13 @@ import {
   FaEdit,
 } from "react-icons/fa";
 
-export default function ProfileScreen({ onBack, onEdit }) {
-  const [profile] = useState({
+export default function ProfileScreen({ profile: profileProp, onBack, onEdit }) {
+  const profile = profileProp || {
     username: "Username",
     email: "user@example.com",
     phone: "+123 456 7890",
     joined: "January 15, 2021",
-  });
+  };
 
   return (
     <div
@@ -98,12 +97,29 @@ export default function ProfileScreen({ onBack, onEdit }) {
             fontSize: 26,
             fontWeight: 700,
             color: "#2D1B69",
-            margin: "0 0 28px",
+            margin: "0 0 10px",
             fontFamily: "system-ui, sans-serif",
           }}
         >
           {profile.username}
         </h2>
+
+        {/* Bio */}
+        <p
+          style={{
+            fontSize: 15,
+            color: profile.bio ? "#5A3A8A" : "#A090C8",
+            textAlign: "center",
+            margin: "0 0 26px",
+            fontFamily: "system-ui, sans-serif",
+            lineHeight: 1.5,
+            maxWidth: "85%",
+            whiteSpace: "pre-wrap",
+            fontStyle: profile.bio ? "normal" : "italic",
+          }}
+        >
+          {profile.bio || "No bio added yet."}
+        </p>
 
         {/* Info cards */}
         <div

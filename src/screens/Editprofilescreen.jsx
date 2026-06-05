@@ -1,10 +1,87 @@
 import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 
-export default function EditProfileScreen({ onBack, onSaved }) {
-  const [form, setForm] = useState({ username: "Username", email: "user@example.com", phone: "+123 456 7890", bio: "" });
+export default function EditProfileScreen({ profile: profileProp, onBack, onSaved }) {
+  const profile = profileProp || {
+    username: "Username",
+    email: "user@example.com",
+    phone: "+123 456 7890",
+    bio: "",
+    joined: "January 15, 2021"
+  };
+
+  const [form, setForm] = useState({
+    username: profile.username,
+    email: profile.email,
+    phone: profile.phone,
+    bio: profile.bio || ""
+  });
   const [focused, setFocused] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleSave = () => {
+    if (!form.username || !form.email || !form.phone) {
+      alert("⚠️ Username, Email, and Phone cannot be empty.");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("eztouch_users") || "[]");
+
+    if (form.username.toLowerCase() !== profile.username.toLowerCase()) {
+      if (users.some(u => u.username.toLowerCase() === form.username.toLowerCase())) {
+        alert("⚠️ Username is already taken.");
+        return;
+      }
+    }
+
+    if (form.email.toLowerCase() !== profile.email.toLowerCase()) {
+      if (users.some(u => u.email.toLowerCase() === form.email.toLowerCase())) {
+        alert("⚠️ Email is already registered.");
+        return;
+      }
+    }
+
+    const updatedUsers = users.map(u => {
+      if (u.username.toLowerCase() === profile.username.toLowerCase() || u.email.toLowerCase() === profile.email.toLowerCase()) {
+        return { ...u, ...form };
+      }
+      return u;
+    });
+
+    localStorage.setItem("eztouch_users", JSON.stringify(updatedUsers));
+
+    const updatedProfile = { ...profile, ...form };
+    localStorage.setItem("eztouch_session", JSON.stringify(updatedProfile));
+
+    setShowSuccess(true);
+  };
+
+  const handleOk = () => {
+    setShowSuccess(false);
+    const updatedProfile = { ...profile, ...form };
+    onSaved && onSaved(updatedProfile);
+  };
+
+  const handleUndo = () => {
+    const users = JSON.parse(localStorage.getItem("eztouch_users") || "[]");
+    const revertedUsers = users.map(u => {
+      if (u.username.toLowerCase() === form.username.toLowerCase() || u.email.toLowerCase() === form.email.toLowerCase()) {
+        return { ...u, username: profile.username, email: profile.email, phone: profile.phone, bio: profile.bio };
+      }
+      return u;
+    });
+
+    localStorage.setItem("eztouch_users", JSON.stringify(revertedUsers));
+    localStorage.setItem("eztouch_session", JSON.stringify(profile));
+
+    setForm({
+      username: profile.username,
+      email: profile.email,
+      phone: profile.phone,
+      bio: profile.bio || ""
+    });
+    setShowSuccess(false);
+  };
 
   const update = key => e => setForm({ ...form, [key]: e.target.value });
 
@@ -56,7 +133,7 @@ export default function EditProfileScreen({ onBack, onSaved }) {
           style={{ ...fieldStyle("bio"), height: 100, padding: "12px 16px", resize: "none", lineHeight: 1.4 }} />
 
         <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-          <button onClick={() => setShowSuccess(true)}
+          <button onClick={handleSave}
             style={{ flex: 1, height: 58, borderRadius: 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
             Save
           </button>
@@ -73,11 +150,11 @@ export default function EditProfileScreen({ onBack, onSaved }) {
           <div style={{ background: "white", borderRadius: 24, padding: "28px 24px", width: "80%", textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
             <p style={{ fontSize: 18, fontWeight: 700, color: "#2D1B69", marginBottom: 6, fontFamily: "system-ui, sans-serif" }}>Profile updated successfully!</p>
             <p style={{ fontSize: 14, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Your changes have been saved.</p>
-            <button onClick={() => { setShowSuccess(false); onSaved && onSaved(); }}
+            <button onClick={handleOk}
               style={{ width: "100%", height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginBottom: 10 }}>
               OK
             </button>
-            <button onClick={() => setShowSuccess(false)}
+            <button onClick={handleUndo}
               style={{ width: "100%", height: 52, borderRadius: 14, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>
               UNDO
             </button>
