@@ -18,6 +18,15 @@ const quickReplies = [
 
 export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
   const { sz } = useSizeContext();
+  const {
+confirmationType
+} = useSizeContext();
+
+console.log(
+"Current confirmation:",
+confirmationType
+);
+
   const [messages, setMessages] = useState(mockMessages);
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main"); // main | voiceRecord | voiceConfirm | quickMsg | callConfirm

@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FaArrowLeft, FaShieldAlt, FaComments, FaHeart, FaPhoneAlt, FaCheck, FaFlask } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 
 function Toggle({ value, onChange }) {
   return (
-    <button onClick={() => onChange(!value)}
-      style={{ width: 52, height: 28, borderRadius: 14, background: value ? "#4CAF50" : "#ccc", border: "none", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background 0.25s" }}>
+    <button 
+      onClick={() => onChange(!value)}
+      style={{ width: 52, height: 28, borderRadius: 14, background: value ? "#4CAF50" : "#ccc", border: "none", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background 0.25s" }}
+    >
       <div style={{ position: "absolute", top: 3, left: value ? 26 : 3, width: 22, height: 22, borderRadius: 11, background: "white", transition: "left 0.25s", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }} />
       <span style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: value ? 6 : "auto", right: value ? "auto" : 6, fontSize: 9, fontWeight: 700, color: "white", fontFamily: "system-ui, sans-serif" }}>{value ? "ON" : "OFF"}</span>
     </button>
@@ -13,32 +15,79 @@ function Toggle({ value, onChange }) {
 }
 
 export default function ConfirmationModeScreen({ onBack }) {
-  const { sz } = useSizeContext();
+  // Unified context extraction into a single statement
   const {
-  confirmationMode,
-  setConfirmationMode,
+    sz,
+    confirmationMode,
+    setConfirmationMode,
+    confirmSendMessage,
+    setConfirmSendMessage,
+    confirmCalls,
+    setConfirmCalls,
+    confirmationType,
+    setConfirmationType,
+    confirmLikes,
+    setConfirmLikes,  
+  } = useSizeContext();
 
-  confirmSendMessage,
-  setConfirmSendMessage,
-
-  confirmCalls,
-  setConfirmCalls,
-
-  confirmationType,
-  setConfirmationType,
-
-  confirmLikes,
-  setConfirmLikes,  
-
-} = useSizeContext();
   const [showDemo, setShowDemo] = useState(false);
-
+  const demoHoldTimer = useRef(null);
+  const tapResetTimer = useRef(null);
+  const demoTapRef = useRef(0);
 
   const types = [
     { label: "Popup Confirmation", color:"#F4B183", desc: "A popup asks you to confirm before any action executes." },
     { label: "Hold-to-confirm", color: "#F6C6D3", desc: "Hold the button down for 1.5 seconds to confirm." },
     { label: "Double-tap-confirm", color: "#A9D4E4", desc: "Tap the button twice to confirm the action." },
   ];
+
+  const handleDemoConfirm = () => {
+    // POPUP CONFIRMATION
+    if (confirmationType === "Popup Confirmation") {
+      alert("✅ Action confirmed!");
+      setShowDemo(false);
+      return;
+    }
+
+    // DOUBLE TAP CONFIRM (Fix: Cleaned up code blocks)
+    if (confirmationType === "Double-tap-confirm") {
+      demoTapRef.current += 1;
+
+      if (demoTapRef.current === 2) {
+        alert("✅ Double tap confirmed!");
+        setShowDemo(false);
+        demoTapRef.current = 0;
+        if (tapResetTimer.current) clearTimeout(tapResetTimer.current);
+        return;
+      }
+
+      if (tapResetTimer.current) {
+        clearTimeout(tapResetTimer.current);
+      }
+
+      tapResetTimer.current = setTimeout(() => {
+        demoTapRef.current = 0;
+      }, 500);
+    }
+  };
+
+  const handleDemoHoldStart = (e) => {
+    if (confirmationType !== "Hold-to-confirm") return;
+    
+    // Clear any residual timer before starting a new one
+    if (demoHoldTimer.current) clearTimeout(demoHoldTimer.current);
+
+    demoHoldTimer.current = setTimeout(() => {
+      alert("✅ Hold confirmed!");
+      setShowDemo(false);
+    }, 1500);
+  };
+
+  const handleDemoHoldEnd = () => {
+    if (demoHoldTimer.current) {
+      clearTimeout(demoHoldTimer.current);
+    }
+  };
 
   return (
     <div style={{ width: "100%", height: "100%", background: "#F4F0FF", display: "flex", flexDirection: "column", position: "relative" }}>
@@ -48,7 +97,6 @@ export default function ConfirmationModeScreen({ onBack }) {
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 36px" }}>
-
         {/* OKU benefit */}
         <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "12px 16px", marginBottom: 20, display: "flex", gap: 10 }}>
           <span style={{ fontSize: 20, color: "#6B3FA0" }}><FaShieldAlt style={{ color: "currentColor" }} /></span>
@@ -81,28 +129,25 @@ export default function ConfirmationModeScreen({ onBack }) {
                   <span style={{ fontSize: 15, fontWeight: 600, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{item.label}</span>
                 </div>
                 <Toggle
-
-  value={
-    item.key === "sendMsg"
-      ? confirmSendMessage
-      : item.key === "makeCalls"
-      ? confirmCalls
-      : item.key === "likeComment"
-      ? confirmLikes
-      : false
-  }
-
-  onChange={
-    item.key === "sendMsg"
-      ? setConfirmSendMessage
-      : item.key === "makeCalls"
-      ? setConfirmCalls
-      : item.key === "likeComment"
-      ? setConfirmLikes
-      : () => {}
-  }
-
-/>
+                  value={
+                    item.key === "sendMsg"
+                      ? confirmSendMessage
+                      : item.key === "makeCalls"
+                      ? confirmCalls
+                      : item.key === "likeComment"
+                      ? confirmLikes
+                      : false
+                  }
+                  onChange={
+                    item.key === "sendMsg"
+                      ? setConfirmSendMessage
+                      : item.key === "makeCalls"
+                      ? setConfirmCalls
+                      : item.key === "likeComment"
+                      ? setConfirmLikes
+                      : () => {}
+                  }
+                />
               </div>
             ))}
 
@@ -119,8 +164,8 @@ export default function ConfirmationModeScreen({ onBack }) {
             ))}
 
             {/* Try it demo */}
-            <button onClick={() => setShowDemo(true)}
-              style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginTop: 8, boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
+            <button onClick={() => { demoTapRef.current = 0; setShowDemo(true); }}
+              style={{ width: "100%", height: sz?.height || 48, borderRadius: sz?.borderRadius || 8, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", marginTop: 8, boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>
               <FaFlask style={{ color: "currentColor", marginRight: 8 }} /> Try Confirmation Demo
             </button>
           </>
@@ -139,8 +184,18 @@ export default function ConfirmationModeScreen({ onBack }) {
               {confirmationType === "Double-tap-confirm" && "Tap YES twice to confirm the call."}
             </p>
             <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => { alert("✅ Action confirmed!"); setShowDemo(false); }} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES</button>
+              <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 8, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <button
+                onClick={confirmationType !== "Hold-to-confirm" ? handleDemoConfirm : undefined}
+                onMouseDown={handleDemoHoldStart}
+                onMouseUp={handleDemoHoldEnd}
+                onMouseLeave={handleDemoHoldEnd}
+                onTouchStart={handleDemoHoldStart}
+                onTouchEnd={handleDemoHoldEnd} 
+                style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 8, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                <FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES
+              </button>
             </div>
           </div>
         </div>
