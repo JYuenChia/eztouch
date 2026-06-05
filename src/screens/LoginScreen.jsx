@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaHandPaper, FaUser, FaLock, FaEye, FaEyeSlash, FaUniversalAccess } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
+import { useToast } from "../components/ToastProvider";
 
 const inputStyle = {
   width: "100%",
@@ -33,6 +34,28 @@ export default function LoginScreen({ onLogin, onRegister }) {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [focused, setFocused] = useState("");
+  const { addToast } = useToast();
+
+  const handleLogin = () => {
+    if (!username || !password) {
+      addToast("Please enter username and password.", "warning");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("eztouch_users") || "[]");
+    const matchedUser = users.find(
+      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+    );
+
+    if (!matchedUser) {
+      addToast("Invalid username or password.", "error");
+      return;
+    }
+
+    addToast("Login successful.", "success");
+    localStorage.setItem("eztouch_session", JSON.stringify(matchedUser));
+    onLogin(matchedUser);
+  };
 
   return (
     <div style={{
@@ -165,7 +188,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
 
         {/* Login button */}
         <button
-          onClick={onLogin}
+          onClick={handleLogin}
           style={{
             width: "100%",
             height: sz.height,

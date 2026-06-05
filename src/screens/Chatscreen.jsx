@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { FaArrowLeft, FaUndo } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 import SafeButton from "../components/SafeButton";
+import { FaArrowLeft } from "react-icons/fa";
+import ReactiveKeyboard from "./ReactiveKeyboard";
+import { useToast } from "../components/ToastProvider";
 
 const mockMessages = [
   { id: 1, text: "Hey! Are you free today?", mine: false },
@@ -40,6 +43,8 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
   // Tracking states for live counting down visible to the user
   const [undoMsgId, setUndoMsgId] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const { addToast } = useToast();
 
   // References to anchor timers firmly without re-render memory leaks
   const undoTimeoutRef = useRef(null);
@@ -105,6 +110,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
         setSecondsLeft(0);
       }, initialSeconds * 1000);
     }
+    setShowKeyboard(false);
   };
 
   // FIX 4: Explicitly reset visual countdown numbers upon cancellation execution
@@ -124,7 +130,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      alert("❌ Voice recognition is not supported by this browser. Please use Google Chrome or Microsoft Edge!");
+      addToast("Voice recognition is not supported by this browser. Please use Google Chrome or Microsoft Edge!", "error");
       setRecording(false);
       setPulse(false);
       return;
@@ -142,6 +148,14 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
 
     recog.onerror = (err) => {
       console.error("Speech recognition error:", err.error);
+      console.error('Speech recognition error:', err.error);
+      
+      if (err.error === 'not-allowed') {
+        addToast("Microphone blocked! Please click the camera/mic icon in your browser address bar and choose 'Allow'.", "error");
+      } else if (err.error === 'no-speech') {
+        addToast("No speech detected. Please try holding the device closer and speaking clearly.", "warning");
+      }
+      
       setRecording(false);
       setPulse(false);
       setMode("main"); 
@@ -152,7 +166,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
       setPulse(false);
       setTranscribed(prev => {
         if (!prev || prev.trim() === "") {
-          alert("Could not catch that clearly. Please try speaking again.");
+          addToast("Could not catch that clearly. Please try speaking again.", "warning");
           setMode("main");
           return "";
         } else {
@@ -239,7 +253,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
               <button onClick={() => { setMode("voiceRecord"); startRecordingSimulation(); }} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFF0E5", border: "2px solid #F5A06A", borderRadius: sz?.borderRadius || 16, padding: sz?.settingPadding || "12px", cursor: "pointer" }}>
                 <div style={{ width: 56, height: 56, borderRadius: 28, background: "linear-gradient(135deg, #F5A06A, #E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🎙️</div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Voice to Text</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Speech to Text</span>
               </button>
               <button onClick={() => setMode("quickMsg")} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFFBEA", border: "2px solid #F5C030", borderRadius: sz?.borderRadius || 16, padding: sz?.settingPadding || "12px", cursor: "pointer" }}>
                 <div style={{ width: 56, height: 56, borderRadius: 28, background: "linear-gradient(135deg, #F5C030, #E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>💡</div>
@@ -247,12 +261,17 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
               </button>
             </div>
             
+            
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <textarea
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder="Type your message here..." rows={2}
-                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69" }} 
+
+                readOnly
+
+                onFocus={() => setShowKeyboard(true)}
+                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor:"pointer"}} 
               />
               <SafeButton
                 confirmationFor="message"
@@ -279,7 +298,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
         {/* Voice Recording View */}
         {mode === "voiceRecord" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "12px 0" }}>
-            <span style={{ fontSize: 16, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>🎙️ Intelligent Voice Processing</span>
+            <span style={{ fontSize: 16, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>🎙️ Speech To Text</span>
             <div style={{
               width: 90, height: 90, borderRadius: 45,
               background: "linear-gradient(135deg, #F5A06A, #E87030)",
@@ -289,8 +308,11 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             }}>
               {recording ? "📡" : "✨"}
             </div>
+            <p style={{ fontSize: 17, color: "#E87030", fontWeight: 700, fontFamily: "system-ui, sans-serif", margin: 0 }}>
+              {recording ? 'Listening ..' : isTyping ? 'Converting Speech to Text...' : 'Ready'}
+            </p>
             <div style={{ width: "100%", background: "#F5F0FF", borderRadius: 16, border: "2px dashed #D0B8F5", padding: "14px", fontSize: 16, color: "#2D1B69", fontFamily: "system-ui, sans-serif", minHeight: 50, textAlign: "center" }}>
-              {transcribed || "Speak now..."}
+              {transcribed || "Transcribing..."}
             </div>
           </div>
         )}
@@ -313,6 +335,8 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             <div style={{ display: "flex", gap: 20 }}>
               <button onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
               <SafeButton confirmationFor="message" onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND MESSAGE</SafeButton>
+              <button onClick={() => setMode("main")} style={{ flex: 1, height: 56, borderRadius: 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: 56, borderRadius: 16, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</button>
             </div>
           </div>
         )}
@@ -342,13 +366,21 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
           <div style={{ background: "white", borderRadius: 32, padding: "32px 24px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>📞</div>
             <p style={{ fontSize: 22, fontWeight: 800, color: "#2D1B69", marginBottom: 8, fontFamily: "system-ui, sans-serif" }}>Confirm Call?</p>
-            <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Are you sure you want to initialize a voice call to {name}?</p>
+            <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Call '{name}'?</p>
             <div style={{ display: "flex", gap: 16 }}>
               <SafeButton onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>NO</SafeButton>
               <SafeButton confirmationFor="call" onClick={() => { setMode("main"); onCall(contact); }} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>YES</SafeButton>
             </div>
           </div>
         </div>
+      )}
+
+      {mode === "main" && showKeyboard &&(
+        <ReactiveKeyboard 
+          value={input} 
+          onChange={setInput} 
+          onSubmit={() => sendMessage(input)} 
+        />
       )}
     </div>
   );

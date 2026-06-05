@@ -1,8 +1,18 @@
 import { useState } from "react";
 import { FaHands, FaPaw, FaSun, FaHeart, FaMobileAlt, FaPalette, FaArrowLeft, FaSearch, FaUsers, FaCheck, FaGlassCheers } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
+import { useState, useEffect } from "react";
+import { FaHands, FaPaw, FaSun, FaHeart, FaMobileAlt, FaPalette, FaArrowLeft, FaSearch, FaUsers, FaCheck, FaGlassCheers, FaPlus, FaUndo } from "react-icons/fa";
+import { useToast } from "../components/ToastProvider";
 
 const CATEGORIES = ["All", "Health", "Pets", "Daily Life", "Support", "Hobbies", "Education"];
+const FORM_CATEGORIES = ["Health", "Pets", "Daily Life", "Support", "Hobbies", "Education"];
+
+const ICONS = [
+  <FaUsers />, <FaHeart />, <FaSun />, <FaPaw />, 
+  <FaPalette />, <FaMobileAlt />, <FaHands />, <FaGlassCheers />
+];
+const COLORS = ["#6B3FA0", "#F5A06A", "#F5C030", "#5AABAB", "#A0C8E8", "#E87070", "#A0C8A0", "#C8A0E8"];
 
 const GROUPS = [
   {
@@ -39,25 +49,80 @@ const GROUPS = [
 
 export default function JoinGroupScreen({ onBack, onJoinedGroup }) {
   const { sz } = useSizeContext();
+export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = [], onCreateGroup }) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [confirmGroup, setConfirmGroup] = useState(null);
   const [joinedGroup, setJoinedGroup] = useState(null);
   const [joinedIds, setJoinedIds] = useState(new Set());
+  const [timeLeft, setTimeLeft] = useState(0);
+  const { addToast } = useToast();
 
-  const filtered = GROUPS.filter(g => {
+  useEffect(() => {
+    let timer;
+    if (joinedGroup && timeLeft > 0) {
+      timer = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (joinedGroup && timeLeft === 0) {
+      confirmJoin(joinedGroup, true);
+    }
+    return () => clearTimeout(timer);
+  }, [joinedGroup, timeLeft]);
+
+  // Creation State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState("Health");
+  const [newDesc, setNewDesc] = useState("");
+  const [newIconIdx, setNewIconIdx] = useState(0);
+
+  const allGroups = [...GROUPS, ...customGroups];
+
+  const filtered = allGroups.filter(g => {
     const matchesSearch = g.name.toLowerCase().includes(search.toLowerCase()) || g.desc.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === "All" || g.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
   const handleJoin = () => {
-    setJoinedIds(prev => new Set([...prev, confirmGroup.id]));
     setJoinedGroup(confirmGroup);
-    if (onJoinedGroup) {
-      onJoinedGroup({ ...confirmGroup, unread: 0, avatar: confirmGroup.icon });
-    }
+    setTimeLeft(30);
     setConfirmGroup(null);
+  };
+
+  const confirmJoin = (group, navigate = true) => {
+    setJoinedIds(prev => new Set([...prev, group.id]));
+    setJoinedGroup(null);
+    if (onJoinedGroup) {
+      onJoinedGroup({ ...group, unread: 0, avatar: group.icon }, navigate);
+    }
+  };
+
+  const undoJoin = () => {
+    setJoinedGroup(null);
+  };
+
+  const handleCreate = () => {
+    if (!newName.trim()) return addToast("Please enter a group name.", "warning");
+    
+    // Check duplicates in the same category
+    const isDuplicate = allGroups.some(g => g.category === newCategory && g.name.toLowerCase() === newName.trim().toLowerCase());
+    if (isDuplicate) return addToast(`A group named "${newName.trim()}" already exists in the ${newCategory} category.`, "warning");
+
+    const newGroup = {
+      id: Date.now(),
+      name: newName.trim(),
+      category: newCategory,
+      desc: newDesc.trim() || "A new community group.",
+      icon: ICONS[newIconIdx],
+      color: COLORS[newIconIdx],
+      members: 1, // You are the sole member
+    };
+
+    setShowCreateModal(false);
+    addToast("Group created successfully!", "success");
+    if (onCreateGroup) {
+      onCreateGroup(newGroup);
+    }
   };
 
   return (
@@ -169,6 +234,27 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup }) {
         ))}
       </div>
 
+      {/* Fixed Create New Group Footer */}
+      <div style={{ background: "white", padding: "16px 20px 24px", borderTop: "1px solid #E8E0F8", flexShrink: 0, zIndex: 10 }}>
+        <button
+          onClick={() => {
+            setNewName("");
+            setNewDesc("");
+            setNewCategory("Health");
+            setNewIconIdx(0);
+            setShowCreateModal(true);
+          }}
+          style={{
+            width: "100%", height: 56, borderRadius: 28, background: "#FFF0E5", border: "2px dashed #F5A06A",
+            color: "#E87030", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            boxShadow: "0 2px 8px rgba(245,160,106,0.15)"
+          }}
+        >
+          <FaPlus /> Create New Group
+        </button>
+      </div>
+
       {/* Join confirmation modal */}
       {confirmGroup && (
         <div
@@ -228,16 +314,29 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup }) {
             <p style={{ fontSize: 14, color: "#888", marginBottom: 28, fontFamily: "system-ui, sans-serif", lineHeight: 1.6 }}>
               You can now read messages and chat with {joinedGroup.members} members!
             </p>
+            <p style={{ fontSize: 13, color: "#E87030", textAlign: "center", fontFamily: "system-ui, sans-serif", margin: "0 0 16px" }}>
+              <FaUndo style={{ color: "currentColor", marginRight: 6 }} />Undo available for {timeLeft}s
+            </p>
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={() => setJoinedGroup(null)}
                 style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#F0EBF8", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+                onClick={undoJoin}
+                style={{ flex: 1, height: 56, borderRadius: 18, background: "#FFF5F5", color: "#E83030", border: "2px solid #E83030", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              >
+                <FaUndo /> Undo
+              </button>
+              <button
+                onClick={() => confirmJoin(joinedGroup, false)}
+                style={{ flex: 1, height: 56, borderRadius: 18, background: "#F0EBF8", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Browse More
               </button>
               <button
                 onClick={() => { setJoinedGroup(null); onBack(); }}
                 style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}
+                onClick={() => confirmJoin(joinedGroup, true)}
+                style={{ flex: 1, height: 56, borderRadius: 18, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}
               >
                 Go to Groups
               </button>
@@ -245,6 +344,80 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup }) {
           </div>
         </div>
       )}
+
+      {/* Create Group Modal */}
+      {showCreateModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 20 }}
+        >
+          <div style={{ background: "white", borderRadius: 32, padding: "28px 24px", width: "100%", maxHeight: "90%", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <p style={{ fontSize: 24, fontWeight: 800, color: "#6B3FA0", margin: "0 0 20px", fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", gap: 10 }}>
+              <FaPlus /> Create Group
+            </p>
+            
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>GROUP NAME</p>
+            <input
+              value={newName}
+              onChange={e => setNewName(e.target.value)}
+              placeholder="e.g. Morning Walkers"
+              style={{ width: "100%", height: 50, borderRadius: 16, border: "2px solid #E8E0F8", padding: "0 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16 }}
+            />
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>CATEGORY</p>
+            <select
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+              style={{ width: "100%", height: 50, borderRadius: 16, border: "2px solid #E8E0F8", padding: "0 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16, background: "white", color: "#2D1B69" }}
+            >
+              {FORM_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>DESCRIPTION (Optional)</p>
+            <textarea
+              value={newDesc}
+              onChange={e => setNewDesc(e.target.value)}
+              placeholder="What is this group about?"
+              rows={2}
+              style={{ width: "100%", borderRadius: 16, border: "2px solid #E8E0F8", padding: "12px 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16, resize: "none" }}
+            />
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>CHOOSE ICON</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+              {ICONS.map((icon, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setNewIconIdx(idx)}
+                  style={{
+                    height: 54, borderRadius: 16, fontSize: 24, display: "flex", alignItems: "center", justifyContent: "center",
+                    border: newIconIdx === idx ? `3px solid ${COLORS[idx]}` : "2px solid transparent",
+                    background: COLORS[idx] + "22", color: COLORS[idx], cursor: "pointer", transition: "all 0.15s"
+                  }}
+                >
+                  {icon}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={handleCreate}
+                style={{ width: "100%", height: 56, borderRadius: 20, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                Create Group
+              </button>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                style={{ width: "100%", height: 56, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
