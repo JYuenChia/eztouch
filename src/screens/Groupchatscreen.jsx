@@ -25,15 +25,15 @@ function getInitMessages(group) {
 }
 
 const quickReplies = [
-  { label: <>I need help <FaLifeRing /></>, color: "#B0A8D0" },
-  { label: <>Give me some time <FaClock /></>, color: "#F5A06A" },
-  { label: <>Thank you! <FaPray /></>, color: "#E87070" },
-  { label: <>That's great! <FaGlassCheers /></>, color: "#5AABAB" },
-  { label: <>I agree <FaThumbsUp /></>, color: "#A0C8A0" },
-  { label: <>Can we talk? <FaComment /></>, color: "#C8A0E8" },
+  { label: <>I need help <FaLifeRing /></>, rawText: "I need help", color: "#B0A8D0" },
+  { label: <>Give me some time <FaClock /></>, rawText: "Give me some time", color: "#F5A06A" },
+  { label: <>Thanks <FaPray /></>, rawText: "Thanks", color: "#E87070" },
+  { label: <>That's great! <FaGlassCheers /></>, rawText: "That's great!", color: "#5AABAB" },
+  { label: <>Okay <FaThumbsUp /></>, rawText: "Okay", color: "#A0C8A0" },
+  { label: <>Can we talk? <FaComment /></>, rawText: "Can we talk?", color: "#C8A0E8" },
 ];
 
-export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
+export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteGroup, onEditGroup }) {
   const [messages, setMessages] = useState(() => getInitMessages(group));
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main");
@@ -46,6 +46,11 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
   const [hasLeft, setHasLeft] = useState(false);
   const bottomRef = useRef(null);
   const [showKeyboard, setShowKeyboard] = useState(false);
+
+  const [editGroupModal, setEditGroupModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [editName, setEditName] = useState(group?.name || "");
+  const [editDesc, setEditDesc] = useState(group?.desc || "");
   
   const name = group?.name || "Pet Lovers";
   const avatar = group?.avatar || <FaCat />;
@@ -55,6 +60,10 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
   const [dummyMembers, setDummyMembers] = useState([]);
 
   useEffect(() => {
+    if (group?.members === 1) {
+      setDummyMembers([]);
+      return;
+    }
     const needed = totalMembersCount - 1 - MEMBERS.length;
     if (needed > 0) {
       const generated = Array.from({ length: needed }, (_, i) => ({
@@ -73,34 +82,78 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = (text) => {
+  const sendMessage = (text, rawText = null) => {
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const newMsg = { id: Date.now(), text, mine: true, time };
+    const msgId = Date.now();
+    const newMsg = { id: msgId, text, mine: true, time };
+    
     setMessages(prev => [...prev, newMsg]);
-    setUndoId(newMsg.id);
-    setTimeout(() => setUndoId(null), 10000);
+    setUndoId(msgId);
+    
+    setTimeout(() => {
+      setUndoId(prev => (prev === msgId ? null : prev));
+    }, 10000);
+    
     setMode("main");
     setInput("");
     setShowKeyboard(false);
+    
+    if (group?.members === 1) return; // Nobody to reply to the creator yet!
 
-    // Simulate a group member reply after 2s
-    setTimeout(() => {
-      const member = MEMBERS[Math.floor(Math.random() * MEMBERS.length)];
-      const replies = [
-        <>Thanks for sharing! <FaSmile /></>,
-        "That's really helpful!",
-        <>I feel the same way <FaHandshake /></>,
-        <>Great point! <FaThumbsUp /></>,
-        <>So true! This community is amazing <FaHeart /></>,
-      ];
-      const reply = replies[Math.floor(Math.random() * replies.length)];
-      const replyTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1, text: reply, mine: false,
-        user: member.name, avatar: member.avatar, color: member.color, time: replyTime,
-      }]);
-    }, 2000 + Math.random() * 1000);
+    let replies = [
+      <>Thanks for sharing! <FaSmile /></>,
+      "That's really helpful!",
+      <>I feel the same way <FaHandshake /></>,
+      <>Great point! <FaThumbsUp /></>,
+      <>So true! This community is amazing <FaHeart /></>,
+    ];
+    
+    let numReplies = 1;
+    
+    if (rawText === "I need help") {
+      replies = ["Are you okay?", "Do you need assistance?", "I'm here for you."];
+      numReplies = 2; // Simulate more engagement for help
+    } else if (rawText === "Thanks") {
+      replies = ["You're welcome!", "Glad I could help."];
+    } else if (rawText === "Okay") {
+      replies = ["Alright.", "Got it.", null]; // sometimes no response
+    } else if (rawText === "Give me some time") {
+      replies = ["Take your time.", "No rush!", "We'll be here when you're ready.", null];
+    } else if (rawText === "That's great!") {
+      replies = ["Awesome!", "So happy to hear that!", <>Right? <FaSmile /></>, "Yay!"];
+    } else if (rawText === "Can we talk?") {
+      replies = ["Sure, I'm here.", "What's on your mind?", "Of course, go ahead.", "We're listening."];
+      numReplies = 2; // Simulate more engagement for someone wanting to talk
+    }
+
+    const shuffledMembers = [...MEMBERS].sort(() => 0.5 - Math.random());
+    const pickedMembers = shuffledMembers.slice(0, numReplies);
+    
+    const shuffledReplies = [...replies].sort(() => 0.5 - Math.random());
+    const pickedReplies = shuffledReplies.slice(0, numReplies);
+
+    pickedMembers.forEach((member, index) => {
+      const reply = pickedReplies[index];
+      if (reply !== null && reply !== undefined) {
+        // Slight delays (1-3 seconds), stacked for multiple replies
+        const delay = 1000 + Math.random() * 2000 + (index * 1500); 
+        
+        setTimeout(() => {
+          setMessages(currentMessages => {
+            // Undo Condition: If user undoes the message, do not generate reply
+            const msgStillExists = currentMessages.some(m => m.id === msgId);
+            if (!msgStillExists) return currentMessages;
+
+            const replyTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            return [...currentMessages, {
+              id: Date.now() + Math.random(), text: reply, mine: false,
+              user: member.name, avatar: member.avatar, color: member.color, time: replyTime,
+            }];
+          });
+        }, delay);
+      }
+    });
   };
 
   const undoLastMessage = () => {
@@ -320,7 +373,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
               {quickReplies.map(r => (
                 <button
                   key={r.label}
-                  onClick={() => sendMessage(r.label)}
+                  onClick={() => sendMessage(r.label, r.rawText)}
                   style={{ height: 54, borderRadius: 24, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
                 >
                   {r.label}
@@ -364,7 +417,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
               </div>
 
               {/* Other members */}
-              {[...MEMBERS, ...dummyMembers].map(m => (
+              {group?.members !== 1 && [...MEMBERS, ...dummyMembers].map(m => (
                 <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 14, background: "#F8F8FF", borderRadius: 16, padding: "10px 14px", flexShrink: 0 }}>
                   <div style={{ width: 42, height: 42, borderRadius: 21, background: m.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{m.avatar}</div>
                   <div style={{ flex: 1 }}>
@@ -377,6 +430,24 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
 
             {/* Divider */}
             <div style={{ height: 1, background: "#F0EBF8", marginBottom: 14, flexShrink: 0 }} />
+
+            {/* Creator Actions */}
+            {group?.isCreator && (
+              <div style={{ display: "flex", gap: 10, marginBottom: 14, flexShrink: 0 }}>
+                <button
+                  onClick={() => { setShowMembersModal(false); setEditGroupModal(true); setEditName(group.name); setEditDesc(group.desc); }}
+                  style={{ flex: 1, height: 48, borderRadius: 16, background: "#E8E0F8", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+                >
+                  Edit Group
+                </button>
+                <button
+                  onClick={() => { setShowMembersModal(false); setDeleteConfirm(true); }}
+                  style={{ flex: 1, height: 48, borderRadius: 16, background: "#FFF5F5", color: "#E83030", border: "2px solid #E83030", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+                >
+                  Delete Group
+                </button>
+              </div>
+            )}
 
             {/* Leave Group — always visible at bottom */}
             <button
@@ -420,6 +491,91 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup }) {
               </button>
               <button
                 onClick={() => setLeaveConfirm(false)}
+                style={{ width: "100%", height: 58, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {editGroupModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 20 }}
+        >
+          <div style={{ background: "white", borderRadius: 32, padding: "28px 24px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <p style={{ fontSize: 24, fontWeight: 800, color: "#6B3FA0", margin: "0 0 20px", fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", gap: 10 }}>
+              <FaCog /> Edit Group
+            </p>
+            
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>GROUP NAME</p>
+            <input
+              value={editName}
+              onChange={e => setEditName(e.target.value)}
+              style={{ width: "100%", height: 50, borderRadius: 16, border: "2px solid #E8E0F8", padding: "0 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16 }}
+            />
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>DESCRIPTION</p>
+            <textarea
+              value={editDesc}
+              onChange={e => setEditDesc(e.target.value)}
+              rows={3}
+              style={{ width: "100%", borderRadius: 16, border: "2px solid #E8E0F8", padding: "12px 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 24, resize: "none" }}
+            />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={() => {
+                  if (editName.trim()) {
+                    onEditGroup({ ...group, name: editName.trim(), desc: editDesc.trim() });
+                    setEditGroupModal(false);
+                  }
+                }}
+                style={{ width: "100%", height: 56, borderRadius: 20, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setEditGroupModal(false)}
+                style={{ width: "100%", height: 56, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Group confirmation */}
+      {deleteConfirm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 24 }}
+        >
+          <div style={{ background: "white", borderRadius: 32, padding: "32px 24px", width: "100%", textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div style={{ fontSize: 48, marginBottom: 12, color: "#E83030" }}><FaExclamationTriangle /></div>
+            <p style={{ fontSize: 21, fontWeight: 800, color: "#2D1B69", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>Delete {name}?</p>
+            <p style={{ fontSize: 14, color: "#888", marginBottom: 28, fontFamily: "system-ui, sans-serif", lineHeight: 1.6 }}>
+              This will permanently delete the group and all its messages. This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <button
+                onClick={() => {
+                  setDeleteConfirm(false);
+                  setShowMembersModal(false);
+                  if (onDeleteGroup) onDeleteGroup(group?.id);
+                }}
+                style={{ width: "100%", height: 58, borderRadius: 20, background: "#E83030", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(232,48,48,0.3)" }}
+              >
+                Yes, Delete Group
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(false)}
                 style={{ width: "100%", height: 58, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Cancel
