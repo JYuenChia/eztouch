@@ -178,8 +178,7 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                 </SafeButton>
 
                 {/* Comment */}
-                <SafeButton
-                  confirmationFor="like"
+                <button
                   aria-label="Comment on post"
                   onClick={() => { setCommenting(commenting === post.id ? null : post.id); setCommentText(""); }}
                   style={{
@@ -193,7 +192,7 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                   <span style={{ fontSize: 14, fontWeight: 700, color: commenting === post.id ? "#6B3FA0" : "#888", fontFamily: "system-ui, sans-serif" }}>
                     {(post.commentsList || []).length}
                   </span>
-                 </SafeButton>
+                 </button>
 
                 {/* Share */}
                 <button
@@ -241,10 +240,11 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                       rows={2}
                       style={{ flex: 1, borderRadius: 14, border: "2px solid #D0B8F5", padding: "10px 14px", fontSize: 15, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69" }}
                     />
-                    <button
+                    <SafeButton
+                      confirmationFor="like"
                       onClick={() => submitComment(post.id)}
                       style={{ width: 48, height: 48, borderRadius: 24, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
-                    ><FaPaperPlane style={{ marginLeft: "-2px" }} /></button>
+                    ><FaPaperPlane style={{ marginLeft: "-2px" }} /></SafeButton>
                   </div>
                 </div>
               )}
@@ -342,7 +342,8 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
             <p style={{ fontSize: 13, fontWeight: 700, color: "#AAA", margin: "0 0 12px", fontFamily: "system-ui, sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>YOUR CONTACTS</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {SHARE_CONTACTS.map(contact => (
-                <button
+                <SafeButton
+                  confirmationFor="message"
                   key={contact.id}
                   onClick={() => shareToContact(contact)}
                   style={{
@@ -359,7 +360,7 @@ export default function CommunityScreen({ onBack, onCreatePost, onJoinGroup, onO
                   </div>
                   <span style={{ fontSize: sz.fontSize, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif", flex: 1 }}>{contact.name}</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: "#6B3FA0", fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", gap: "6px" }}>Send <FaArrowRight /></span>
-                </button>
+                </SafeButton>
               ))}
             </div>
           </div>

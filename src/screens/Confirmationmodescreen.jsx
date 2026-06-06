@@ -49,7 +49,7 @@ export default function ConfirmationModeScreen({ onBack }) {
   const handleDemoConfirm = () => {
     // POPUP CONFIRMATION
     if (confirmationType === "Popup Confirmation") {
-      alert("✅ Action confirmed!");
+      addToast("✅ Action confirmed!", "success");
       setShowDemo(false);
       return;
     }
@@ -59,7 +59,7 @@ export default function ConfirmationModeScreen({ onBack }) {
       demoTapRef.current += 1;
 
       if (demoTapRef.current === 2) {
-        alert("✅ Double tap confirmed!");
+        addToast("✅ Double tap confirmed!", "success");
         setShowDemo(false);
         demoTapRef.current = 0;
         if (tapResetTimer.current) clearTimeout(tapResetTimer.current);
@@ -83,7 +83,7 @@ export default function ConfirmationModeScreen({ onBack }) {
     if (demoHoldTimer.current) clearTimeout(demoHoldTimer.current);
 
     demoHoldTimer.current = setTimeout(() => {
-      alert("✅ Hold confirmed!");
+      addToast("✅ Hold confirmed!", "success");
       setShowDemo(false);
     }, 1500);
   };
@@ -201,8 +201,6 @@ export default function ConfirmationModeScreen({ onBack }) {
               >
                 <FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES
               </button>
-              <button onClick={() => setShowDemo(false)} style={{ flex: 1, height: 52, borderRadius: 14, background: "#888", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => { addToast("Action confirmed!", "success"); setShowDemo(false); }} style={{ flex: 1, height: 52, borderRadius: 14, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaCheck style={{ color: "currentColor", marginRight: 8 }} />YES</button>
             </div>
           </div>
         </div>

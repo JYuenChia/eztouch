@@ -276,8 +276,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
                 aria-label="Send message"
                 onClick={() => {
                   if (input.trim()) {
-                    setTranscribed(input);
-                    setMode("voiceConfirm");
+                    sendMessage(input);
                   }
                 }}
                 style={{

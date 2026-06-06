@@ -3,6 +3,7 @@ import { FaUser, FaGlassCheers, FaSmile, FaHandshake, FaHands, FaLifeRing, FaClo
 import { useSizeContext } from "../context/SizeContext";
 import ReactiveKeyboard from "./ReactiveKeyboard";
 import { useToast } from "../components/ToastProvider";
+import SafeButton from "../components/SafeButton";
 
 const MEMBERS = [
   { id: 1, name: "Anna", avatar: <FaUser />, color: "#E8A0A0" },
@@ -36,14 +37,24 @@ const quickReplies = [
 ];
 
 export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteGroup, onEditGroup }) {
-  const { sz } = useSizeContext();
+  const {
+    sz,
+    undoOn = true,
+    undoDuration = "10 Seconds",
+    undoSendMessage = true
+  } = useSizeContext();
   const [messages, setMessages] = useState(() => getInitMessages(group));
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main");
   const [transcribed, setTranscribed] = useState("");
   const [recording, setRecording] = useState(false);
-  const [undoId, setUndoId] = useState(null);
   const [pulse, setPulse] = useState(false);
+  
+  const [undoMsgId, setUndoMsgId] = useState(null);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const undoTimeoutRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+  
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const [hasLeft, setHasLeft] = useState(false);
@@ -86,18 +97,57 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const getUndoDelaySeconds = () => {
+    if (undoDuration === "30 Seconds") return 30;
+    if (undoDuration === "60 Seconds") return 60;
+    return 10;
+  };
+
+  const clearActiveTimers = () => {
+    if (undoTimeoutRef.current) {
+      clearTimeout(undoTimeoutRef.current);
+      undoTimeoutRef.current = null;
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => clearActiveTimers();
+  }, []);
+
   const sendMessage = (text, rawText = null) => {
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const msgId = Date.now();
     const newMsg = { id: msgId, text, mine: true, time };
+    const isUndoProtected = undoOn && undoSendMessage;
 
     setMessages(prev => [...prev, newMsg]);
-    setUndoId(msgId);
 
-    setTimeout(() => {
-      setUndoId(prev => (prev === msgId ? null : prev));
-    }, 10000);
+    if (isUndoProtected) {
+      clearActiveTimers();
+      const initialSeconds = getUndoDelaySeconds();
+      setUndoMsgId(msgId);
+      setSecondsLeft(initialSeconds);
+
+      countdownIntervalRef.current = setInterval(() => {
+        setSecondsLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownIntervalRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      undoTimeoutRef.current = setTimeout(() => {
+        setUndoMsgId(null);
+        setSecondsLeft(0);
+      }, initialSeconds * 1000);
+    }
 
     setMode("main");
     setInput("");
@@ -106,14 +156,16 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
     if (group?.members === 1) return; // Nobody to reply to the creator yet!
 
     let replies = [
+      "Oh, interesting!",
+      "I see!",
+      "Tell me more about that.",
       <>Thanks for sharing! <FaSmile /></>,
-      "That's really helpful!",
-      <>I feel the same way <FaHandshake /></>,
-      <>Great point! <FaThumbsUp /></>,
-      <>So true! This community is amazing <FaHeart /></>,
+      "That's really nice to know.",
+      "Got it!"
     ];
 
     let numReplies = 1;
+    const lowerText = (rawText || (typeof text === "string" ? text : "")).toLowerCase();
 
     if (rawText === "I need help") {
       replies = ["Are you okay?", "Do you need assistance?", "I'm here for you."];
@@ -129,6 +181,10 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
     } else if (rawText === "Can we talk?") {
       replies = ["Sure, I'm here.", "What's on your mind?", "Of course, go ahead.", "We're listening."];
       numReplies = 2; // Simulate more engagement for someone wanting to talk
+    } else if (lowerText.match(/\b(hello|hi|hey|morning|afternoon|evening)\b/)) {
+      replies = ["Hello there!", "Hi! How are you doing today?", <>Hey! Nice to see you <FaSmile /></>, "Hello!"];
+    } else if (lowerText.match(/\b(how are you|how r u|what's up)\b/)) {
+      replies = ["I'm doing well, thanks!", "Pretty good! You?", "All good here!"];
     }
 
     const shuffledMembers = [...MEMBERS].sort(() => 0.5 - Math.random());
@@ -140,8 +196,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
     pickedMembers.forEach((member, index) => {
       const reply = pickedReplies[index];
       if (reply !== null && reply !== undefined) {
-        // Slight delays (1-3 seconds), stacked for multiple replies
-        const delay = 1000 + Math.random() * 2000 + (index * 1500);
+        // Base delay of 30 seconds to simulate slow typing, plus some variance
+        const delay = 30000 + Math.random() * 5000 + (index * 4000);
 
         setTimeout(() => {
           setMessages(currentMessages => {
@@ -161,8 +217,10 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
   };
 
   const undoLastMessage = () => {
-    setMessages(prev => prev.filter(m => m.id !== undoId));
-    setUndoId(null);
+    clearActiveTimers();
+    setMessages(prev => prev.filter(m => m.id !== undoMsgId));
+    setUndoMsgId(null);
+    setSecondsLeft(0);
   };
 
   const startVoice = () => {
@@ -266,13 +324,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#6B3FA0", fontFamily: "system-ui, sans-serif" }}>{msg.user}</span>
                   </div>
                 )}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: msg.mine ? "flex-end" : "flex-start" }}>
-                  {msg.mine && msg.id === undoId && (
-                    <button
-                      onClick={undoLastMessage}
-                      style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#6B3FA0", padding: "8px", fontFamily: "system-ui, sans-serif", whiteSpace: "nowrap" }}
-                    ><FaUndo /> UNDO</button>
-                  )}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: msg.mine ? "flex-end" : "flex-start", width: "100%" }}>
                   <div style={{
                     maxWidth: "75%",
                     background: msg.mine ? "linear-gradient(135deg,#6B3FA0,#8B5CC8)" : "white",
@@ -284,6 +336,33 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
                     {msg.text}
                   </div>
                 </div>
+
+                {msg.mine && msg.id === undoMsgId && (
+                  <button
+                    aria-label="Undo sent message"
+                    onClick={undoLastMessage}
+                    style={{
+                      background: "#FFF0F5",
+                      border: "1px dashed #E87070",
+                      borderRadius: 12,
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: "700",
+                      color: "#E87070",
+                      padding: "6px 14px",
+                      marginTop: 4,
+                      fontFamily: "system-ui, sans-serif",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      boxShadow: "0 2px 5px rgba(232,112,112,0.1)"
+                    }}
+                  >
+                    <FaUndo size={11} style={{ transform: "scaleX(-1)" }} />
+                    UNDO SEND ({secondsLeft}s left)
+                  </button>
+                )}
+
                 <span style={{ fontSize: 11, color: "#BBB", margin: "3px 4px 0", fontFamily: "system-ui, sans-serif", alignSelf: msg.mine ? "flex-end" : "flex-start" }}>{msg.time}</span>
               </div>
             ))}
@@ -302,17 +381,17 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
             <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
               <button
                 onClick={() => { setMode("voiceRecord"); startVoice(); }}
-                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFF0E5", border: "2px solid #F5A06A", borderRadius: 22, padding: "16px 10px", cursor: "pointer" }}
+                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFF0E5", border: "2px solid #F5A06A", borderRadius: sz?.borderRadius || 22, padding: sz?.settingPadding || "16px 10px", cursor: "pointer" }}
               >
                 <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5A06A,#E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaMicrophone /></div>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Speech to Text</span>
+                <span style={{ fontSize: sz?.fontSize || 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Speech to Text</span>
               </button>
               <button
                 onClick={() => setMode("quickMsg")}
-                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFFBEA", border: "2px solid #F5C030", borderRadius: 22, padding: "16px 10px", cursor: "pointer" }}
+                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFFBEA", border: "2px solid #F5C030", borderRadius: sz?.borderRadius || 22, padding: sz?.settingPadding || "16px 10px", cursor: "pointer" }}
               >
                 <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5C030,#E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaLightbulb /></div>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Taps</span>
+                <span style={{ fontSize: sz?.fontSize || 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Taps</span>
               </button>
             </div>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -328,11 +407,12 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
 
                 style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor: "pointer" }}
               />
-              <button
+              <SafeButton
+                confirmationFor="message"
                 aria-label="Send message"
-                onClick={() => { if (input.trim()) { setTranscribed(input); setMode("voiceConfirm"); } }}
+                onClick={() => { if (input.trim()) { sendMessage(input); } }}
                 style={{ width: 58, height: 58, borderRadius: 29, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
-              ><FaPaperPlane /></button>
+              ><FaPaperPlane /></SafeButton>
             </div>
           </>
         )}
@@ -372,7 +452,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
             />
             <div style={{ display: "flex", gap: 16 }}>
               <button onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 54, borderRadius: sz?.borderRadius || 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 54, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</button>
+              <SafeButton confirmationFor="message" onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 54, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</SafeButton>
             </div>
           </div>
         )}
@@ -386,13 +466,14 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {quickReplies.map(r => (
-                <button
+                <SafeButton
                   key={r.label}
+                  confirmationFor="message"
                   onClick={() => sendMessage(r.label, r.rawText)}
-                  style={{ height: 54, borderRadius: 24, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
+                  style={{ height: sz?.height || 54, borderRadius: sz?.borderRadius || 24, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 15, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
                 >
                   {r.label}
-                </button>
+                </SafeButton>
               ))}
             </div>
           </div>

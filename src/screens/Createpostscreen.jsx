@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { FaArrowLeft, FaUser, FaSmile, FaDumbbell, FaPray, FaFrown, FaHeart, FaMicrophone, FaCircle, FaImage, FaClipboard } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 import { useToast } from "../components/ToastProvider";
+import SafeButton from "../components/SafeButton";
 
 export default function CreatePostScreen({ onBack, onNext }) {
   const { sz } = useSizeContext();
@@ -223,10 +224,11 @@ export default function CreatePostScreen({ onBack, onNext }) {
                 onClick={() => setShowConfirm(false)}
                 style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >Edit More</button>
-              <button
+              <SafeButton
+                confirmationFor="message"
                 onClick={() => { setShowConfirm(false); onNext && onNext(text, image); }}
                 style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}
-              >Continue</button>
+              >Continue</SafeButton>
             </div>
           </div>
         </div>
