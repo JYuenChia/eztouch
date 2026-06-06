@@ -74,15 +74,7 @@ function ContactRow({ contact, onClick, sz }) {
         )}
       </div>
 
-      <span style={{
-        fontSize: sz.fontSize,
-        fontWeight: 600,
-        color: "#2D1B69",
-        fontFamily: "system-ui, sans-serif",
-      }}>
-        {contact.name}
-      </span>
-      {/* 🛠️ Stacks Name and Message text fields vertically */}
+
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4, overflow: "hidden" }}>
         <span style={{
           fontSize: 20,

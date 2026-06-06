@@ -92,8 +92,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", background: "#FAFAFA", display: "flex", flexDirection: "column" }}>
-      <ToastProvider>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#1a1a2e" }}>
+      <div style={{ width: "100%", maxWidth: 440, height: "100vh", maxHeight: "100vh", overflow: "hidden", position: "relative", background: "#FAFAFA", display: "flex", flexDirection: "column", boxShadow: "0 0 40px rgba(0,0,0,0.5)" }}>
+        <ToastProvider>
         {screen === "splash" && <SplashScreen onNext={() => go("login")} />}
           {screen === "login" && <LoginScreen onLogin={(user) => { setCurrentUser(user); go("home"); }} onRegister={() => go("register")} />}
           {screen === "register" && <RegisterScreen onSignUp={() => go("login")} onBack={() => go("login")} />}
@@ -144,12 +145,7 @@ export default function App() {
           />}
           {screen === "groupchat" && <GroupChatScreen group={selectedGroup} onBack={() => go("community")} onLeaveGroup={(id) => { leaveGroup(id); go("community"); }} onDeleteGroup={(id) => { deleteGroup(id); go("community"); }} onEditGroup={editGroup} />}
 
-        {/* ── Settings Module ── */}
-        {screen === "settings" && <SettingsScreen onBack={() => go("home")} onButtonSize={() => go("buttonsize")} onSafeInteraction={() => go("safeinteraction")} onConfirmation={() => go("confirmation")} onUndo={() => go("undosetting")} />}
-        {screen === "buttonsize" && <ButtonSizeScreen onBack={() => go("settings")} />}
-        {screen === "safeinteraction" && <SafeInteractionScreen onBack={() => go("settings")} />}
-        {screen === "confirmation" && <ConfirmationModeScreen onBack={() => go("settings")} />}
-        {screen === "undosetting" && <UndoSettingScreen onBack={() => go("settings")} />}
+
           {/* ── Profile Module ── */}
           {screen === "profile" && <ProfileScreen profile={currentUser} onBack={() => go("home")} onEdit={() => go("editprofile")} onLogout={() => { localStorage.removeItem("eztouch_session"); go("login"); }} />}
           {screen === "editprofile" && <EditProfileScreen profile={currentUser} onBack={() => go("profile")} onSaved={(updatedUser) => { setCurrentUser(updatedUser); go("profile"); }} />}
@@ -162,5 +158,6 @@ export default function App() {
           {screen === "undosetting" && <UndoSettingScreen onBack={() => go("settings")} />}
         </ToastProvider>
       </div>
+    </div>
   );
 }
