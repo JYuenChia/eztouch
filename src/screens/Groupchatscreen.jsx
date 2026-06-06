@@ -55,7 +55,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [editName, setEditName] = useState(group?.name || "");
   const [editDesc, setEditDesc] = useState(group?.desc || "");
-  
+
   const name = group?.name || "Pet Lovers";
   const avatar = group?.avatar || <FaCat />;
   const avatarColor = group?.color || "#C8A0E8";
@@ -91,18 +91,18 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const msgId = Date.now();
     const newMsg = { id: msgId, text, mine: true, time };
-    
+
     setMessages(prev => [...prev, newMsg]);
     setUndoId(msgId);
-    
+
     setTimeout(() => {
       setUndoId(prev => (prev === msgId ? null : prev));
     }, 10000);
-    
+
     setMode("main");
     setInput("");
     setShowKeyboard(false);
-    
+
     if (group?.members === 1) return; // Nobody to reply to the creator yet!
 
     let replies = [
@@ -112,9 +112,9 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
       <>Great point! <FaThumbsUp /></>,
       <>So true! This community is amazing <FaHeart /></>,
     ];
-    
+
     let numReplies = 1;
-    
+
     if (rawText === "I need help") {
       replies = ["Are you okay?", "Do you need assistance?", "I'm here for you."];
       numReplies = 2; // Simulate more engagement for help
@@ -133,7 +133,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
 
     const shuffledMembers = [...MEMBERS].sort(() => 0.5 - Math.random());
     const pickedMembers = shuffledMembers.slice(0, numReplies);
-    
+
     const shuffledReplies = [...replies].sort(() => 0.5 - Math.random());
     const pickedReplies = shuffledReplies.slice(0, numReplies);
 
@@ -141,8 +141,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
       const reply = pickedReplies[index];
       if (reply !== null && reply !== undefined) {
         // Slight delays (1-3 seconds), stacked for multiple replies
-        const delay = 1000 + Math.random() * 2000 + (index * 1500); 
-        
+        const delay = 1000 + Math.random() * 2000 + (index * 1500);
+
         setTimeout(() => {
           setMessages(currentMessages => {
             // Undo Condition: If user undoes the message, do not generate reply
@@ -325,8 +325,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
                 readOnly
 
                 onFocus={() => setShowKeyboard(true)}
-                
-                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor:"pointer"}} 
+
+                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor: "pointer" }}
               />
               <button
                 aria-label="Send message"
@@ -371,10 +371,8 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
               style={{ width: "100%", boxSizing: "border-box", background: "white", borderRadius: 14, padding: "12px 16px", fontSize: 17, fontWeight: "bold", color: "#2D1B69", fontFamily: "system-ui, sans-serif", marginBottom: 16, border: "2px solid #D0B8F5", lineHeight: 1.4, outline: "none", resize: "none" }}
             />
             <div style={{ display: "flex", gap: 16 }}>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND TO GROUP</button>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: 54, borderRadius: 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: 54, borderRadius: 16, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</button>
+              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 54, borderRadius: sz?.borderRadius || 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 54, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</button>
             </div>
           </div>
         )}
@@ -390,8 +388,6 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
               {quickReplies.map(r => (
                 <button
                   key={r.label}
-                  onClick={() => sendMessage(r.label)}
-                  style={{ height: sz.height, borderRadius: sz.borderRadius, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
                   onClick={() => sendMessage(r.label, r.rawText)}
                   style={{ height: 54, borderRadius: 24, background: r.color, color: "white", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", padding: "0 12px" }}
                 >
@@ -530,7 +526,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
             <p style={{ fontSize: 24, fontWeight: 800, color: "#6B3FA0", margin: "0 0 20px", fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", gap: 10 }}>
               <FaCog /> Edit Group
             </p>
-            
+
             <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>GROUP NAME</p>
             <input
               value={editName}
@@ -603,11 +599,11 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
           </div>
         </div>
       )}
-      {mode === "main" && showKeyboard &&(
-        <ReactiveKeyboard 
-          value={input} 
-          onChange={setInput} 
-          onSubmit={() => sendMessage(input)} 
+      {mode === "main" && showKeyboard && (
+        <ReactiveKeyboard
+          value={input}
+          onChange={setInput}
+          onSubmit={() => sendMessage(input)}
         />
       )}
     </div>

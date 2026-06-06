@@ -20,13 +20,13 @@ const quickReplies = [
 
 export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
   const { sz, confirmationType } = useSizeContext();
-  
+
   // ==========================================
   // EXTRACT GLOBAL UNDO PREFERENCES FROM CONTEXT
   // ==========================================
-  const { 
-    undoOn = true, 
-    undoDuration = "10 Seconds", 
+  const {
+    undoOn = true,
+    undoDuration = "10 Seconds",
     undoSendMessage = true
   } = useSizeContext();
 
@@ -35,10 +35,10 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
   const [messages, setMessages] = useState(mockMessages);
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("main"); // main | voiceRecord | voiceConfirm | quickMsg | callConfirm
-  const [transcribed, setTranscribed] = useState(""); 
+  const [transcribed, setTranscribed] = useState("");
   const [recording, setRecording] = useState(false);
   const [pulse, setPulse] = useState(false);
-  
+
   // Tracking states for live counting down visible to the user
   const [undoMsgId, setUndoMsgId] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -127,55 +127,54 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
     setPulse(true);
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
     if (!SpeechRecognition) {
-      addToast("Voice recognition is not supported by this browser. Please use Google Chrome or Microsoft Edge!", "error");
+      addToast("Voice recognition is not supported. Please use Google Chrome or Microsoft Edge.", "error");
       setRecording(false);
       setPulse(false);
       return;
     }
 
     const recog = new SpeechRecognition();
-    recog.lang = "en-MY"; 
-    recog.interimResults = false; 
+    recog.lang = "en-MY";
+    recog.interimResults = true;
+    recog.continuous = false;
     recog.maxAlternatives = 1;
 
+    // Prevent garbage collection bug in some Chrome versions
+    window.__activeSpeechRecog = recog;
+
     recog.onresult = (event) => {
-      const realSpokenText = event.results[0][0].transcript;
-      setTranscribed(realSpokenText);
+      const text = event.results[event.resultIndex][0].transcript;
+      setTranscribed(text);
     };
 
     recog.onerror = (err) => {
-      console.error("Speech recognition error:", err.error);
-      console.error('Speech recognition error:', err.error);
-      
-      if (err.error === 'not-allowed') {
-        addToast("Microphone blocked! Please click the camera/mic icon in your browser address bar and choose 'Allow'.", "error");
-      } else if (err.error === 'no-speech') {
-        addToast("No speech detected. Please try holding the device closer and speaking clearly.", "warning");
+      if (err.error === "not-allowed") {
+        addToast("Microphone blocked! Please allow mic access in your browser.", "error");
       }
-      
       setRecording(false);
       setPulse(false);
-      setMode("main"); 
+      setMode("main");
     };
 
     recog.onend = () => {
       setRecording(false);
       setPulse(false);
       setTranscribed(prev => {
-        if (!prev || prev.trim() === "") {
+        if (!prev || !prev.trim()) {
           addToast("Could not catch that clearly. Please try speaking again.", "warning");
           setMode("main");
           return "";
-        } else {
-          setMode("voiceConfirm"); 
-          return prev;
         }
+        setMode("voiceConfirm");
+        return prev;
       });
     };
 
-    try { recog.start(); } catch (e) { setRecording(false); setMode("main"); }
+    try { recog.start(); } catch (e) {
+      setRecording(false);
+      setMode("main");
+    }
   };
 
   const name = contact?.name || "Boyfriend";
@@ -214,18 +213,18 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             {/* Live Interactive Countdown Undo Banner */}
             {msg.mine && msg.id === undoMsgId && (
               /* FIX 2: Enhanced interaction accessibility mapping for assistive technology layers */
-              <button 
+              <button
                 aria-label="Undo sent message"
-                onClick={undoLastMessage} 
-                style={{ 
-                  background: "#FFF0F5", 
-                  border: "1px dashed #E87070", 
+                onClick={undoLastMessage}
+                style={{
+                  background: "#FFF0F5",
+                  border: "1px dashed #E87070",
                   borderRadius: 12,
-                  cursor: "pointer", 
-                  fontSize: 13, 
-                  fontWeight: "700", 
-                  color: "#E87070", 
-                  padding: "6px 14px", 
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: "700",
+                  color: "#E87070",
+                  padding: "6px 14px",
                   marginTop: 2,
                   fontFamily: "system-ui, sans-serif",
                   display: "flex",
@@ -234,7 +233,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
                   boxShadow: "0 2px 5px rgba(232,112,112,0.1)"
                 }}
               >
-                <FaUndo size={11} style={{ transform: "scaleX(-1)" }} /> 
+                <FaUndo size={11} style={{ transform: "scaleX(-1)" }} />
                 UNDO SEND ({secondsLeft}s left)
               </button>
             )}
@@ -259,8 +258,8 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
                 <span style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Taps</span>
               </button>
             </div>
-            
-            
+
+
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <textarea
                 value={input}
@@ -270,7 +269,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
                 readOnly
 
                 onFocus={() => setShowKeyboard(true)}
-                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor:"pointer"}} 
+                style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor: "pointer" }}
               />
               <SafeButton
                 confirmationFor="message"
@@ -308,7 +307,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
               {recording ? "📡" : "✨"}
             </div>
             <p style={{ fontSize: 17, color: "#E87030", fontWeight: 700, fontFamily: "system-ui, sans-serif", margin: 0 }}>
-              {recording ? 'Listening ..' : isTyping ? 'Converting Speech to Text...' : 'Ready'}
+              {recording ? 'Listening ..' : 'Ready'}
             </p>
             <div style={{ width: "100%", background: "#F5F0FF", borderRadius: 16, border: "2px dashed #D0B8F5", padding: "14px", fontSize: 16, color: "#2D1B69", fontFamily: "system-ui, sans-serif", minHeight: 50, textAlign: "center" }}>
               {transcribed || "Transcribing..."}
@@ -323,19 +322,17 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             <p style={{ fontSize: 15, color: "#2D1B69", fontWeight: 500, margin: "0 0 12px", fontFamily: "system-ui, sans-serif" }}>Review or edit your statement below before sending:</p>
             <textarea
               value={transcribed}
-              onChange={(e) => setTranscribed(e.target.value)} 
+              onChange={(e) => setTranscribed(e.target.value)}
               rows={3}
-              style={{ 
-                width: "100%", boxSizing: "border-box", background: "white", borderRadius: 16, padding: "14px 18px", 
-                fontSize: 18, fontWeight: "bold", color: "#2D1B69", fontFamily: "system-ui, sans-serif", 
-                marginBottom: 20, border: "2px solid #D0B8F5", lineHeight: 1.4, outline: "none", resize: "none" 
-              }} 
+              style={{
+                width: "100%", boxSizing: "border-box", background: "white", borderRadius: 16, padding: "14px 18px",
+                fontSize: 18, fontWeight: "bold", color: "#2D1B69", fontFamily: "system-ui, sans-serif",
+                marginBottom: 20, border: "2px solid #D0B8F5", lineHeight: 1.4, outline: "none", resize: "none"
+              }}
             />
             <div style={{ display: "flex", gap: 20 }}>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <SafeButton confirmationFor="message" onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND MESSAGE</SafeButton>
-              <button onClick={() => setMode("main")} style={{ flex: 1, height: 56, borderRadius: 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
-              <button onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: 56, borderRadius: 16, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</button>
+              <button onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 56, borderRadius: sz?.borderRadius || 16, background: "#E0E0E0", color: "#444", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>CANCEL</button>
+              <SafeButton confirmationFor="message" onClick={() => sendMessage(transcribed)} style={{ flex: 1, height: sz?.height || 56, borderRadius: sz?.borderRadius || 16, background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}>SEND</SafeButton>
             </div>
           </div>
         )}
@@ -374,11 +371,11 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
         </div>
       )}
 
-      {mode === "main" && showKeyboard &&(
-        <ReactiveKeyboard 
-          value={input} 
-          onChange={setInput} 
-          onSubmit={() => sendMessage(input)} 
+      {mode === "main" && showKeyboard && (
+        <ReactiveKeyboard
+          value={input}
+          onChange={setInput}
+          onSubmit={() => sendMessage(input)}
         />
       )}
     </div>
