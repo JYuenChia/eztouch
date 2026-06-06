@@ -4,7 +4,7 @@ import SplashScreen from "./screens/SplashScreen";
 import { FaCat, FaGraduationCap, FaHandsHelping, FaBook, FaUser } from "react-icons/fa";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
-import HomeDashboard from "./screens/HomeDashboard";
+import HomeDashboard from "./screens/Homedashboard";
 import ChatList from "./screens/Chatlist";
 import ChatScreen from "./screens/Chatscreen";
 import CallingScreen from "./screens/Callingscreen";
