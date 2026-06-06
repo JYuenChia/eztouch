@@ -92,11 +92,9 @@ export default function App() {
   };
 
   return (
-    //<SizeProvider>
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#1a1a2e" }}>
-      <div style={{ width: 390, height: 844, borderRadius: 44, overflow: "hidden", position: "relative", boxShadow: "0 0 0 10px #111, 0 0 0 12px #333", background: "#fff" }}>
-        <ToastProvider>
-          {screen === "splash" && <SplashScreen onNext={() => go("login")} />}
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", background: "#FAFAFA", display: "flex", flexDirection: "column" }}>
+      <ToastProvider>
+        {screen === "splash" && <SplashScreen onNext={() => go("login")} />}
           {screen === "login" && <LoginScreen onLogin={(user) => { setCurrentUser(user); go("home"); }} onRegister={() => go("register")} />}
           {screen === "register" && <RegisterScreen onSignUp={() => go("login")} onBack={() => go("login")} />}
 
@@ -164,7 +162,5 @@ export default function App() {
           {screen === "undosetting" && <UndoSettingScreen onBack={() => go("settings")} />}
         </ToastProvider>
       </div>
-    </div>
-   //</SizeProvider> 
   );
 }

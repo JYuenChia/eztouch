@@ -60,49 +60,54 @@ export default function LoginScreen({ onLogin, onRegister }) {
   return (
     <div style={{
       width: "100%",
-      height: "100%",
-      background: "#FAFAFA",
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)",
       display: "flex",
-      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "env(safe-area-inset-top, 24px) env(safe-area-inset-right, 24px) env(safe-area-inset-bottom, 24px) env(safe-area-inset-left, 24px)",
+      boxSizing: "border-box",
       overflowY: "auto",
     }}>
-      {/* Purple header curve */}
       <div style={{
-        background: "linear-gradient(135deg, #6B3FA0, #8B5CC8)",
-        borderBottomLeftRadius: 40,
-        borderBottomRightRadius: 40,
-        padding: "52px 32px 36px",
-        textAlign: "center",
-        flexShrink: 0,
+        width: "100%",
+        maxWidth: 440,
+        background: "white",
+        borderRadius: 32,
+        padding: "40px 32px",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+        display: "flex",
+        flexDirection: "column",
+        boxSizing: "border-box",
       }}>
-        <div style={{
-          width: 100,
-          height: 100,
-          borderRadius: 50,
-          background: "rgba(255,255,255,0.2)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "0 auto 16px",
-          fontSize: 30,
-        }}><FaHandPaper style={{ color: "rgb(234, 223, 0)" }} /></div>
-        <h1 style={{
-          color: "white",
-          fontSize: 32,
-          fontWeight: 700,
-          margin: 0,
-          fontFamily: "system-ui, sans-serif",
-        }}>Login</h1>
-        <p style={{
-          color: "rgba(255,255,255,0.75)",
-          fontSize: 15,
-          margin: "6px 0 0",
-          fontFamily: "system-ui, sans-serif",
-        }}>Welcome back to EzTouch</p>
-      </div>
-
-      {/* Form */}
-      <div style={{ padding: "36px 28px", flex: 1 }}>
+        {/* Header Area inside Card */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            width: 88,
+            height: 88,
+            borderRadius: 44,
+            background: "rgba(107, 63, 160, 0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 16px",
+            fontSize: 32,
+          }}><FaHandPaper style={{ color: "#6B3FA0" }} /></div>
+          <h1 style={{
+            color: "#2D1B69",
+            fontSize: 32,
+            fontWeight: 800,
+            margin: 0,
+            fontFamily: "system-ui, sans-serif",
+          }}>Login</h1>
+          <p style={{
+            color: "#6B3FA0",
+            fontSize: 16,
+            margin: "6px 0 0",
+            fontWeight: 500,
+            fontFamily: "system-ui, sans-serif",
+          }}>Welcome back to EzTouch</p>
+        </div>
 
         {/* Username */}
         <div style={{ marginBottom: 20 }}>
