@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaHandPaper, FaUser, FaLock, FaEye, FaEyeSlash, FaUniversalAccess } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 import { useToast } from "../components/ToastProvider";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 const inputStyle = {
   width: "100%",
@@ -29,11 +30,11 @@ const iconWrap = {
 };
 
 export default function LoginScreen({ onLogin, onRegister }) {
-  const { sz } = useSizeContext();
+  const { sz, isMobile } = useSizeContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [focused, setFocused] = useState("");
+  const [activeField, setActiveField] = useState(null);
   const { addToast } = useToast();
 
   const handleLogin = () => {
@@ -126,11 +127,13 @@ export default function LoginScreen({ onLogin, onRegister }) {
               placeholder="Enter your username"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              onFocus={() => setFocused("username")}
-              onBlur={() => setFocused("")}
+              onClick={() => isMobile && setActiveField("username")}
+              onFocus={() => !isMobile && setActiveField("username")}
+              onBlur={() => !isMobile && setActiveField(null)}
+              readOnly={isMobile}
               style={{
                 ...inputStyle,
-                border: focused === "username" ? "2px solid #7B4CC8" : "2px solid #E0D6F5",
+                border: activeField === "username" ? "2px solid #7B4CC8" : "2px solid #E0D6F5",
               }}
             />
           </div>
@@ -153,12 +156,14 @@ export default function LoginScreen({ onLogin, onRegister }) {
               placeholder="Enter your password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              onFocus={() => setFocused("password")}
-              onBlur={() => setFocused("")}
+              onClick={() => isMobile && setActiveField("password")}
+              onFocus={() => !isMobile && setActiveField("password")}
+              onBlur={() => !isMobile && setActiveField(null)}
+              readOnly={isMobile}
               style={{
                 ...inputStyle,
                 paddingRight: 56,
-                border: focused === "password" ? "2px solid #7B4CC8" : "2px solid #E0D6F5",
+                border: activeField === "password" ? "2px solid #7B4CC8" : "2px solid #E0D6F5",
               }}
             />
             <button
@@ -259,6 +264,22 @@ export default function LoginScreen({ onLogin, onRegister }) {
           }}>Accessibility features are enabled for easier navigation</p>
         </div>
       </div>
+      
+      
+      {isMobile && activeField === "username" && (
+        <ReactiveKeyboard
+          value={username}
+          onChange={setUsername}
+          onSubmit={() => setActiveField(null)}
+        />
+      )}
+      {isMobile && activeField === "password" && (
+        <ReactiveKeyboard
+          value={password}
+          onChange={setPassword}
+          onSubmit={() => setActiveField(null)}
+        />
+      )}
     </div>
   );
 }

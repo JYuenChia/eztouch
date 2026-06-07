@@ -43,6 +43,7 @@ export default function CreatePostScreen({ onBack, onNext }) {
     recog.maxAlternatives = 1;
     setRecording(true);
     setPulse(true);
+    window.__activeSpeechRecog = recog;
 
     recog.onresult = (event) => {
       setText(event.results[0][0].transcript);
@@ -72,11 +73,11 @@ export default function CreatePostScreen({ onBack, onNext }) {
 
       {/* Header */}
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button
+        <SafeButton
           aria-label="Back"
           onClick={onBack}
           style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px", minWidth: 44, minHeight: 44 }}
-        ><FaArrowLeft /></button>
+        ><FaArrowLeft /></SafeButton>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Create Post</h1>
       </div>
 
@@ -96,7 +97,7 @@ export default function CreatePostScreen({ onBack, onNext }) {
           <p style={{ fontSize: 14, fontWeight: 700, color: "#6B3FA0", margin: "0 0 10px", fontFamily: "system-ui, sans-serif", textTransform: "uppercase", letterSpacing: 0.5 }}>How are you feeling?</p>
           <div style={{ display: "flex", gap: 10 }}>
             {MOODS.map(m => (
-              <button
+              <SafeButton
                 key={m.id}
                 onClick={() => setMood(m.id)}
                 style={{
@@ -109,7 +110,7 @@ export default function CreatePostScreen({ onBack, onNext }) {
               >
                 <span style={{ fontSize: 22 }}>{m.emoji}</span>
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#6B3FA0", fontFamily: "system-ui, sans-serif" }}>{m.label}</span>
-              </button>
+              </SafeButton>
             ))}
           </div>
         </div>
@@ -139,11 +140,11 @@ export default function CreatePostScreen({ onBack, onNext }) {
 
         {/* Voice to text section */}
         <div style={{ background: "white", borderRadius: 22, padding: "20px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(107,63,160,0.07)" }}>
-          <p style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", margin: 0, fontFamily: "system-ui, sans-serif" }}><FaMicrophone /> Dictate Instead</p>
+          <p style={{ fontSize: 16, fontWeight: 700, color: "#2D1B69", margin: 0, fontFamily: "system-ui, sans-serif" }}>🎙️ Dictate Instead</p>
           <p style={{ fontSize: 13, color: "#888", margin: 0, fontFamily: "system-ui, sans-serif", textAlign: "center" }}>
             Struggling to type? Tap the mic and speak your post!
           </p>
-          <button
+          <SafeButton
             onClick={startVoice}
             style={{
               width: 80, height: 80, borderRadius: 40,
@@ -157,20 +158,35 @@ export default function CreatePostScreen({ onBack, onNext }) {
               transition: "all 0.3s",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
-          ><FaMicrophone /></button>
+          >{recording ? "📡" : "✨"}</SafeButton>
           <p style={{ fontSize: 15, color: recording ? "#E87030" : "#888", fontWeight: 600, margin: 0, fontFamily: "system-ui, sans-serif" }}>
             {recording ? "🔴 Listening... Speak clearly" : "Tap to speak"}
           </p>
+          {recording && (
+            <button
+              onClick={() => {
+                const recog = window.__activeSpeechRecog;
+                if (recog) recog.stop();
+              }}
+              style={{
+                padding: "10px 24px", borderRadius: 20, background: "#E87030", color: "white",
+                border: "none", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 4,
+                boxShadow: "0 4px 12px rgba(232,112,48,0.3)"
+              }}
+            >
+              Done Speaking
+            </button>
+          )}
         </div>
 
         {/* Add image placeholder */}
         {image ? (
           <div style={{ position: "relative", width: "100%", borderRadius: 18, overflow: "hidden", border: "2px solid #D0B8F5", flexShrink: 0 }}>
             <img src={image} alt="Preview" style={{ width: "100%", maxHeight: 200, objectFit: "cover", display: "block" }} />
-            <button onClick={() => setImage(null)} style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,0.5)", color: "white", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✕</button>
+            <SafeButton onClick={() => setImage(null)} style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,0.5)", color: "white", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✕</SafeButton>
           </div>
         ) : (
-          <button
+          <SafeButton
             onClick={() => fileInputRef.current?.click()}
             style={{
               display: "flex", alignItems: "center", gap: 14,
@@ -181,12 +197,12 @@ export default function CreatePostScreen({ onBack, onNext }) {
           >
             <div style={{ width: 48, height: 48, borderRadius: 24, background: "#F0E8FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}><FaImage /></div>
             <span style={{ fontSize: 16, fontWeight: 700, color: "#6B3FA0", fontFamily: "system-ui, sans-serif" }}>Add a Photo</span>
-          </button>
+          </SafeButton>
         )}
         <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" style={{ display: "none" }} />
 
         {/* NEXT button */}
-        <button
+        <SafeButton
           onClick={handleNext}
           style={{
             width: "100%", height: sz.height, borderRadius: sz.borderRadius,
@@ -200,7 +216,7 @@ export default function CreatePostScreen({ onBack, onNext }) {
           }}
         >
           Preview Post →
-        </button>
+        </SafeButton>
       </div>
 
       {/* Anti-accidental post confirmation modal */}
@@ -220,10 +236,10 @@ export default function CreatePostScreen({ onBack, onNext }) {
               <p style={{ fontSize: 15, color: "#2D1B69", fontFamily: "system-ui, sans-serif", margin: 0, lineHeight: 1.5 }}>{text}</p>
             </div>
             <div style={{ display: "flex", gap: 14 }}>
-              <button
+              <SafeButton
                 onClick={() => setShowConfirm(false)}
                 style={{ flex: 1, height: sz.height, borderRadius: sz.borderRadius, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
-              >Edit More</button>
+              >Edit More</SafeButton>
               <SafeButton
                 confirmationFor="message"
                 onClick={() => { setShowConfirm(false); onNext && onNext(text, image); }}

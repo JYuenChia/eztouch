@@ -8,6 +8,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
+import SafeButton from "../components/SafeButton";
 
 export default function ProfileScreen({ profile: profileProp, onBack, onEdit, onLogout }) {
   const { sz } = useSizeContext();
@@ -40,7 +41,7 @@ export default function ProfileScreen({ profile: profileProp, onBack, onEdit, on
           flexShrink: 0,
         }}
       >
-        <button
+        <SafeButton
           onClick={onBack}
           style={{
             background: "none",
@@ -51,7 +52,7 @@ export default function ProfileScreen({ profile: profileProp, onBack, onEdit, on
           }}
         >
           <FaArrowLeft />
-        </button>
+        </SafeButton>
 
         <h1
           style={{
@@ -168,7 +169,7 @@ export default function ProfileScreen({ profile: profileProp, onBack, onEdit, on
         </div>
 
         {/* Edit Profile button */}
-        <button
+        <SafeButton
           onClick={onEdit}
           style={{
             width: "100%",
@@ -190,10 +191,10 @@ export default function ProfileScreen({ profile: profileProp, onBack, onEdit, on
         >
           <FaEdit />
           Edit Profile
-        </button>
+        </SafeButton>
 
         {/* Log Out button */}
-        <button
+        <SafeButton
           onClick={onLogout}
           style={{
             width: "100%",
@@ -215,7 +216,7 @@ export default function ProfileScreen({ profile: profileProp, onBack, onEdit, on
         >
           <FaSignOutAlt />
           Log Out
-        </button>
+        </SafeButton>
       </div>
     </div>
   );

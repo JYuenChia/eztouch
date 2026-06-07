@@ -17,14 +17,45 @@ const DUMMY_NAMES = ["John", "Emily", "Michael", "Sarah", "Chris", "Jessica", "D
 
 function getInitMessages(group) {
   if (group?.isNew) return [];
-  const groupName = group?.name || "Pet Lovers";
-  return [
-    { id: 1, text: <>Welcome to {groupName}! <FaGlassCheers /></>, mine: false, user: "Anna", avatar: <FaUser />, color: "#E8A0A0", time: "9:00 AM" },
-    { id: 2, text: <>Hello everyone! So happy to be here <FaSmile /></>, mine: false, user: "Ravi", avatar: <FaUser />, color: "#A0C8E8", time: "9:02 AM" },
-    { id: 3, text: <>Hi all! Looking forward to connecting with you all <FaHandshake /></>, mine: true, time: "9:05 AM" },
-    { id: 4, text: "Has anyone tried the voice typing feature yet? It's amazing for those of us with hand difficulties!", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
-    { id: 5, text: <>Yes! Life changing! <FaHands /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" },
-  ];
+  const groupName = group?.name || "Group";
+  const cat = group?.category || "General";
+  
+  const baseMsg1 = { id: 1, text: <>Welcome to {groupName}! <FaGlassCheers /></>, mine: false, user: "Anna", avatar: <FaUser />, color: "#E8A0A0", time: "9:00 AM" };
+  const baseMsg2 = { id: 2, text: <>Hello everyone! So happy to be here <FaSmile /></>, mine: false, user: "Ravi", avatar: <FaUser />, color: "#A0C8E8", time: "9:02 AM" };
+  const baseMsg3 = { id: 3, text: <>Hi all! Looking forward to connecting with you all <FaHandshake /></>, mine: true, time: "9:05 AM" };
+
+  if (cat === "Health" || cat === "Support") {
+    return [
+      baseMsg1, baseMsg2, baseMsg3,
+      { id: 4, text: "Has anyone tried the voice typing feature yet? It's amazing for those of us with hand difficulties!", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+      { id: 5, text: <>Yes! Life changing! <FaHands /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" }
+    ];
+  } else if (cat === "Pets") {
+    return [
+      baseMsg1, baseMsg2, baseMsg3,
+      { id: 4, text: "Look at my new cat, she's so cute! Anyone else have a tabby?", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+      { id: 5, text: <>Aww! I have a golden retriever, he loves to play outside <FaPaw /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" }
+    ];
+  } else if (cat === "Hobbies") {
+    return [
+      baseMsg1, baseMsg2, baseMsg3,
+      { id: 4, text: "I just finished painting my first canvas using adaptive brushes!", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+      { id: 5, text: <>That's wonderful! I've been gardening a lot lately. <FaSun /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" }
+    ];
+  } else if (cat === "Education") {
+    return [
+      baseMsg1, baseMsg2, baseMsg3,
+      { id: 4, text: "Can someone explain how to use the screen reader on this phone?", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+      { id: 5, text: <>Sure! Go to settings and look for accessibility options. <FaMobileAlt /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" }
+    ];
+  } else {
+    // Daily Life or others
+    return [
+      baseMsg1, baseMsg2, baseMsg3,
+      { id: 4, text: "What's everyone having for lunch today?", mine: false, user: "Mei Lin", avatar: <FaUser />, color: "#F0C0B0", time: "9:08 AM" },
+      { id: 5, text: <>I'm having some soup and a sandwich! <FaSmile /></>, mine: false, user: "David", avatar: <FaUser />, color: "#A0D0A0", time: "9:10 AM" }
+    ];
+  }
 }
 
 const quickReplies = [
@@ -39,6 +70,7 @@ const quickReplies = [
 export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteGroup, onEditGroup }) {
   const {
     sz,
+    isMobile,
     undoOn = true,
     undoDuration = "10 Seconds",
     undoSendMessage = true
@@ -383,14 +415,14 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
                 onClick={() => { setMode("voiceRecord"); startVoice(); }}
                 style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFF0E5", border: "2px solid #F5A06A", borderRadius: sz?.borderRadius || 22, padding: sz?.settingPadding || "16px 10px", cursor: "pointer" }}
               >
-                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5A06A,#E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaMicrophone /></div>
+                <div style={{ width: 56, height: 56, borderRadius: 28, background: "linear-gradient(135deg,#F5A06A,#E87030)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🎙️</div>
                 <span style={{ fontSize: sz?.fontSize || 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Speech to Text</span>
               </button>
               <button
                 onClick={() => setMode("quickMsg")}
                 style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "#FFFBEA", border: "2px solid #F5C030", borderRadius: sz?.borderRadius || 22, padding: sz?.settingPadding || "16px 10px", cursor: "pointer" }}
               >
-                <div style={{ width: 52, height: 52, borderRadius: 26, background: "linear-gradient(135deg,#F5C030,#E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}><FaLightbulb /></div>
+                <div style={{ width: 56, height: 56, borderRadius: 28, background: "linear-gradient(135deg,#F5C030,#E89010)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>💡</div>
                 <span style={{ fontSize: sz?.fontSize || 15, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>Quick Taps</span>
               </button>
             </div>
@@ -400,11 +432,10 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
                 onChange={e => setInput(e.target.value)}
                 placeholder="Type your message here..."
                 rows={2}
-
-                readOnly
-
-                onFocus={() => setShowKeyboard(true)}
-
+                onClick={() => isMobile && setShowKeyboard(true)}
+                onFocus={() => !isMobile && setShowKeyboard(true)}
+                onBlur={() => !isMobile && setShowKeyboard(false)}
+                readOnly={isMobile}
                 style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 14px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor: "pointer" }}
               />
               <SafeButton
@@ -420,7 +451,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
         {/* VOICE RECORDING mode */}
         {mode === "voiceRecord" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "8px 0" }}>
-            <span style={{ fontSize: 15, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}><FaMicrophone /> Speech To Text</span>
+            <span style={{ fontSize: 15, color: "#6B3FA0", fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>🎙️ Speech To Text</span>
             <div style={{
               width: 88, height: 88, borderRadius: 44,
               background: "linear-gradient(135deg,#F5A06A,#E87030)",
@@ -428,7 +459,7 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
               boxShadow: pulse ? "0 0 0 18px rgba(245,160,106,0.2)" : "0 6px 20px rgba(245,160,106,0.3)",
               transition: "box-shadow 0.4s",
             }}>
-              {recording ? <FaBroadcastTower /> : <FaMagic />}
+              {recording ? "📡" : "✨"}
             </div>
             <p style={{ fontSize: 16, color: "#E87030", fontWeight: 700, fontFamily: "system-ui, sans-serif", margin: 0 }}>
               {recording ? "Listening..." : "Processing..."}
@@ -436,6 +467,21 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
             <div style={{ width: "100%", background: "#F5F0FF", borderRadius: 14, border: "2px dashed #D0B8F5", padding: "12px", fontSize: 15, color: "#2D1B69", fontFamily: "system-ui, sans-serif", minHeight: 44, textAlign: "center" }}>
               {transcribed || "Transcribing..."}
             </div>
+            {recording && (
+              <button
+                onClick={() => {
+                  const recog = window.__activeSpeechRecog;
+                  if (recog) recog.stop();
+                }}
+                style={{
+                  padding: "12px 32px", borderRadius: 24, background: "#E87030", color: "white",
+                  border: "none", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 8,
+                  boxShadow: "0 4px 12px rgba(232,112,48,0.3)"
+                }}
+              >
+                Done Speaking
+              </button>
+            )}
           </div>
         )}
 
@@ -680,11 +726,14 @@ export default function GroupChatScreen({ group, onBack, onLeaveGroup, onDeleteG
           </div>
         </div>
       )}
-      {mode === "main" && showKeyboard && (
+      {isMobile && mode === "main" && showKeyboard && (
         <ReactiveKeyboard
           value={input}
           onChange={setInput}
-          onSubmit={() => sendMessage(input)}
+          onSubmit={() => {
+            sendMessage(input);
+            setShowKeyboard(false);
+          }}
         />
       )}
     </div>

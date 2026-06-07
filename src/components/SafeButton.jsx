@@ -7,8 +7,10 @@ export default function SafeButton({
   onClick,
   style = {},
   confirmationFor = null,
+  "aria-label": ariaLabel,
 }) {
   const {
+    safeMode,
     preventRapidTaps,
     longPressMode,
     doubleTapMode,
@@ -24,30 +26,54 @@ export default function SafeButton({
   const clickLock = useRef(false);
   const [tapCount, setTapCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null);
   const pressTimer = useRef(null);
   const tapResetTimer = useRef(null);
 
-  // =========================
-  // EXECUTE FINAL ACTION
-  // =========================
-  const executeProtectedAction = () => {
-    onClick();
+  // Computed Safe Interaction States
+  const isSafeModeActive = safeMode === true;
+  const isRapidTapProtected = isSafeModeActive && preventRapidTaps;
+  const isDoubleTap = isSafeModeActive && doubleTapMode;
+  const isLongPress = isSafeModeActive && longPressMode;
+  const hasTouchDelay = isSafeModeActive && touchDelay;
 
-    // RAPID TAP PROTECTION
-    if (preventRapidTaps) {
-      // Synchronously lock immediately before the asynchronous state update
+  // Computed Confirmation States
+  const requiresConfirmation = () => {
+    if (!confirmationMode) return false;
+    if (confirmationFor === "message" && confirmSendMessage) return true;
+    if (confirmationFor === "call" && confirmCalls) return true;
+    if (confirmationFor === "like" && confirmLikes) return true;
+    return false;
+  };
+
+  // 1. Execute Final Action (after both Safe Interaction and Confirmation)
+  const executeFinalAction = () => {
+    if (onClick) onClick();
+  };
+
+  // 2. Trigger Action (after Safe Interaction gesture is successful)
+  const triggerAction = () => {
+    // Rapid tap protection
+    if (isRapidTapProtected) {
       clickLock.current = true;
       setDisabled(true);
-
       setTimeout(() => {
         clickLock.current = false;
         setDisabled(false);
       }, 1000);
     }
+
+    if (requiresConfirmation()) {
+      setShowModal(true);
+    } else {
+      if (hasTouchDelay) {
+        setTimeout(() => executeFinalAction(), 300);
+      } else {
+        executeFinalAction();
+      }
+    }
   };
 
-  // Helper to handle double-tap sequence processing safely with React State
+  // 3. Gestures
   const handleDoubleTapCheck = () => {
     if (tapResetTimer.current) clearTimeout(tapResetTimer.current);
 
@@ -63,114 +89,51 @@ export default function SafeButton({
       setTapCount(0);
     }, 500);
 
-    // Check if the tapCount was already at 1 right before this click executed
-    return tapCount === 1;
+    return tapCount === 1; // It was 1 before this tap, so now it's 2
   };
 
-  // =========================
-  // MAIN CLICK LOGIC
-  // =========================
-  const handleClick = () => {
-    // RAPID TAP PREVENTION
-    if (preventRapidTaps && clickLock.current) {
-      return;
-    }
+  const handleClick = (e) => {
+    e.stopPropagation();
 
-    // DOUBLE PRESS MODE
-    if (doubleTapMode) {
-      const isDouble = handleDoubleTapCheck();
-      if (!isDouble) return; 
-    }
+    if (isRapidTapProtected && clickLock.current) return;
 
-    // =========================
-    // CONFIRMATION MODE
-    // =========================
-    if (confirmationMode) {
-      // MESSAGE CONFIRMATION
-      if (confirmationFor === "message" && confirmSendMessage) {
-        if (confirmationType === "Popup Confirmation") {
-          setPendingAction(() => executeProtectedAction);
-          setShowModal(true);
-          return;
-        }
+    if (isLongPress) return; // Long press is handled by mouse down/up
 
-        if (confirmationType === "Double-tap-confirm") {
-          const isDouble = handleDoubleTapCheck();
-          if (!isDouble) return;
-        }
+    if (isDoubleTap) {
+      if (handleDoubleTapCheck()) {
+        triggerAction();
       }
-
-      // CALL CONFIRMATION
-      if (confirmationFor === "call" && confirmCalls) {
-        if (confirmationType === "Popup Confirmation") {
-          setPendingAction(() => executeProtectedAction);
-          setShowModal(true);
-          return;
-        }
-      }
-
-      // LIKE / COMMENT CONFIRMATION
-      if (confirmationFor === "like" && confirmLikes) {
-        if (confirmationType === "Popup Confirmation") {
-          setPendingAction(() => executeProtectedAction);
-          setShowModal(true);
-          return;
-        }
-
-        if (confirmationType === "Double-tap-confirm") {
-          const isDouble = handleDoubleTapCheck();
-          if (!isDouble) return;
-        }
-      }
-    }
-
-    // =========================
-    // TOUCH DELAY
-    // =========================
-    if (touchDelay) {
-      setTimeout(() => {
-        executeProtectedAction();
-      }, 300);
     } else {
-      executeProtectedAction();
+      triggerAction();
     }
   };
 
-  // =========================
-  // LONG PRESS / HOLD CONFIRM
-  // =========================
-  const handleMouseDown = () => {
-    if (!longPressMode && !(confirmationMode && confirmationType === "Hold-to-confirm")) {
-      return;
-    }
-
+  const handleMouseDown = (e) => {
+    if (!isLongPress) return;
+    
     pressTimer.current = setTimeout(() => {
-      executeProtectedAction();
-    }, 1500);
+      triggerAction();
+    }, 1500); // Wait for 1.5s hold
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
     if (pressTimer.current) {
       clearTimeout(pressTimer.current);
     }
   };
 
-  // =========================
-  // RENDER
-  // =========================
   return (
     <>
       <button
         disabled={disabled}
         aria-disabled={disabled}
-        onClick={
-          !longPressMode && !(confirmationMode && confirmationType === "Hold-to-confirm")
-            ? handleClick
-            : undefined
-        }
+        aria-label={ariaLabel}
+        onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchEnd={handleMouseUp}
         style={{
           border: "none",
           cursor: disabled ? "not-allowed" : "pointer",
@@ -189,9 +152,8 @@ export default function SafeButton({
         onCancel={() => setShowModal(false)}
         onConfirm={() => {
           setShowModal(false);
-          if (pendingAction) {
-            pendingAction();
-          }
+          // Wait to execute just slightly to allow modal to close smoothly
+          setTimeout(() => executeFinalAction(), 50);
         }}
       />
     </>

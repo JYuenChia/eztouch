@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { FaHands, FaPaw, FaSun, FaHeart, FaMobileAlt, FaPalette, FaArrowLeft, FaSearch, FaUsers, FaCheck, FaGlassCheers, FaPlus, FaUndo } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 import { useToast } from "../components/ToastProvider";
+import SafeButton from "../components/SafeButton";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 const CATEGORIES = ["All", "Health", "Pets", "Daily Life", "Support", "Hobbies", "Education"];
 const FORM_CATEGORIES = ["Health", "Pets", "Daily Life", "Support", "Hobbies", "Education"];
@@ -66,12 +68,13 @@ const GROUPS = [
 ];
 
 export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = [], onCreateGroup, myGroups = [], onGoToGroup }) {
-  const { sz } = useSizeContext();
+  const { sz, isMobile } = useSizeContext();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [confirmGroup, setConfirmGroup] = useState(null);
   const [joinedGroup, setJoinedGroup] = useState(null);
   const [joinedIds, setJoinedIds] = useState(new Set());
+  const [activeField, setActiveField] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const { addToast } = useToast();
 
@@ -147,11 +150,11 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
 
       {/* Header */}
       <div style={{ background: "white", padding: "48px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #E8E0F8", flexShrink: 0 }}>
-        <button
+        <SafeButton
           aria-label="Back"
           onClick={onBack}
           style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px", minWidth: 44, minHeight: 44 }}
-        ><FaArrowLeft /></button>
+        ><FaArrowLeft /></SafeButton>
         <h1 style={{ fontSize: 26, fontWeight: 700, color: "#6B3FA0", margin: 0, fontFamily: "system-ui, sans-serif" }}>Find Groups</h1>
       </div>
 
@@ -160,15 +163,19 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
         {/* Search bar */}
         <div style={{ position: "relative", marginBottom: 18 }}>
           <input
+            type="text"
+            placeholder="Search groups..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search groups by name or topic..."
+            onChange={(e) => !isMobile && setSearch(e.target.value)}
+            onClick={() => isMobile && setActiveField("search")}
+            onFocus={() => !isMobile && setActiveField("search")}
+            onBlur={() => !isMobile && setActiveField(null)}
+            readOnly={isMobile}
             style={{
-              width: "100%", height: 54, borderRadius: 27,
-              border: "2px solid #D0B8F5", padding: "0 52px 0 20px",
-              fontSize: 16, background: "white", outline: "none",
-              fontFamily: "system-ui, sans-serif", boxSizing: "border-box",
-              color: "#2D1B69",
+              width: "100%", height: 50, borderRadius: 25, border: "2px solid #E8E0F8",
+              padding: "0 20px 0 52px", fontSize: 16, background: "#F5F0FF",
+              color: "#2D1B69", outline: "none", boxSizing: "border-box",
+              fontFamily: "system-ui, sans-serif"
             }}
           />
           <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 22 }}><FaSearch /></span>
@@ -178,7 +185,7 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
         <p style={{ fontSize: 14, fontWeight: 700, color: "#6B3FA0", margin: "0 0 10px", fontFamily: "system-ui, sans-serif", textTransform: "uppercase", letterSpacing: 0.5 }}>Categories</p>
         <div style={{ display: "flex", gap: 8, marginBottom: 22, flexWrap: "wrap" }}>
           {CATEGORIES.map(c => (
-            <button
+            <SafeButton
               key={c}
               onClick={() => setActiveCategory(c)}
               style={{
@@ -192,7 +199,7 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
                 transition: "all 0.2s",
                 boxShadow: activeCategory === c ? "0 3px 10px rgba(107,63,160,0.25)" : "none",
               }}
-            >{c}</button>
+            >{c}</SafeButton>
           ))}
         </div>
 
@@ -230,7 +237,7 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
             </div>
 
             {/* Join button */}
-            <button
+            <SafeButton
               onClick={() => !joinedIds.has(group.id) && setConfirmGroup(group)}
               style={{
                 width: "100%", height: sz.height, borderRadius: sz.borderRadius, border: "none",
@@ -245,15 +252,15 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
                 transition: "all 0.2s",
               }}
             >
-              {joinedIds.has(group.id) ? "<><FaCheck /> Joined</>" : "Join Group"}
-            </button>
+              {joinedIds.has(group.id) ? <><FaCheck /> Joined</> : "Join Group"}
+            </SafeButton>
           </div>
         ))}
       </div>
 
       {/* Fixed Create New Group Footer */}
       <div style={{ background: "white", padding: "16px 20px 24px", borderTop: "1px solid #E8E0F8", flexShrink: 0, zIndex: 10 }}>
-        <button
+        <SafeButton
           onClick={() => {
             setNewName("");
             setNewDesc("");
@@ -269,7 +276,7 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
           }}
         >
           <FaPlus /> Create New Group
-        </button>
+        </SafeButton>
       </div>
 
       {/* Join confirmation modal */}
@@ -298,18 +305,18 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
               <FaUsers /> {confirmGroup.members} members already inside
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <button
+              <SafeButton
                 onClick={handleJoin}
                 style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(107,63,160,0.3)" }}
               >
                 <><FaCheck /> Yes, Join Group</>
-              </button>
-              <button
+              </SafeButton>
+              <SafeButton
                 onClick={() => setConfirmGroup(null)}
                 style={{ width: "100%", height: sz.height, borderRadius: sz.borderRadius, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: sz.fontSize, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Cancel
-              </button>
+              </SafeButton>
             </div>
           </div>
         </div>
@@ -335,19 +342,19 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
               <FaUndo style={{ color: "currentColor", marginRight: 6 }} />Undo available for {timeLeft}s
             </p>
             <div style={{ display: "flex", gap: 12 }}>
-              <button
+              <SafeButton
                 onClick={undoJoin}
                 style={{ flex: 1, height: 56, borderRadius: 18, background: "#FFF5F5", color: "#E83030", border: "2px solid #E83030", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               >
                 <FaUndo /> Undo
-              </button>
-              <button
+              </SafeButton>
+              <SafeButton
                 onClick={() => setJoinedGroup(null)}
                 style={{ flex: 1, height: 56, borderRadius: 18, background: "#F0EBF8", color: "#6B3FA0", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Browse More
-              </button>
-              <button
+              </SafeButton>
+              <SafeButton
                 onClick={() => {
                   setJoinedGroup(null);
                   if (onGoToGroup) onGoToGroup(joinedGroup);
@@ -355,7 +362,7 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
                 style={{ flex: 1, height: 56, borderRadius: 18, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 14px rgba(107,63,160,0.3)" }}
               >
                 Go to Groups
-              </button>
+              </SafeButton>
             </div>
           </div>
         </div>
@@ -375,10 +382,15 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
             
             <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>GROUP NAME</p>
             <input
+              type="text"
+              placeholder="Name your group"
               value={newName}
-              onChange={e => setNewName(e.target.value)}
-              placeholder="e.g. Morning Walkers"
-              style={{ width: "100%", height: 50, borderRadius: 16, border: "2px solid #E8E0F8", padding: "0 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16 }}
+              onChange={(e) => !isMobile && setNewName(e.target.value)}
+              onClick={() => isMobile && setActiveField("newName")}
+              onFocus={() => !isMobile && setActiveField("newName")}
+              onBlur={() => !isMobile && setActiveField(null)}
+              readOnly={isMobile}
+              style={{ width: "100%", height: 56, borderRadius: 16, border: "2px solid #E8E0F8", padding: "0 18px", fontSize: 16, background: "#F5F0FF", color: "#2D1B69", outline: "none", boxSizing: "border-box", fontFamily: "system-ui, sans-serif", marginBottom: 20 }}
             />
 
             <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>CATEGORY</p>
@@ -393,16 +405,20 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
             <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>DESCRIPTION (Optional)</p>
             <textarea
               value={newDesc}
-              onChange={e => setNewDesc(e.target.value)}
+              onChange={(e) => !isMobile && setNewDesc(e.target.value)}
+              onClick={() => isMobile && setActiveField("newDesc")}
+              onFocus={() => !isMobile && setActiveField("newDesc")}
+              onBlur={() => !isMobile && setActiveField(null)}
+              readOnly={isMobile}
               placeholder="What is this group about?"
               rows={2}
-              style={{ width: "100%", borderRadius: 16, border: "2px solid #E8E0F8", padding: "12px 16px", fontSize: 16, fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16, resize: "none" }}
+              style={{ width: "100%", borderRadius: 16, border: "2px solid #E8E0F8", padding: "12px 16px", fontSize: 16, background: "#F5F0FF", fontFamily: "system-ui, sans-serif", boxSizing: "border-box", marginBottom: 16, resize: "none" }}
             />
 
             <p style={{ fontSize: 14, fontWeight: 700, color: "#888", margin: "0 0 8px", fontFamily: "system-ui, sans-serif" }}>CHOOSE ICON</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
               {ICONS.map((icon, idx) => (
-                <button
+                <SafeButton
                   key={idx}
                   onClick={() => setNewIconIdx(idx)}
                   style={{
@@ -412,28 +428,31 @@ export default function JoinGroupScreen({ onBack, onJoinedGroup, customGroups = 
                   }}
                 >
                   {icon}
-                </button>
+                </SafeButton>
               ))}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button
+              <SafeButton
                 onClick={handleCreate}
                 style={{ width: "100%", height: 56, borderRadius: 20, background: "linear-gradient(135deg,#6B3FA0,#8B5CC8)", color: "white", border: "none", cursor: "pointer", fontSize: 18, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Create Group
-              </button>
-              <button
+              </SafeButton>
+              <SafeButton
                 onClick={() => setShowCreateModal(false)}
                 style={{ width: "100%", height: 56, borderRadius: 20, background: "white", color: "#666", border: "2px solid #E8E0F8", cursor: "pointer", fontSize: 17, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}
               >
                 Cancel
-              </button>
+              </SafeButton>
             </div>
           </div>
         </div>
       )}
 
+      {isMobile && activeField === "search" && <ReactiveKeyboard value={search} onChange={setSearch} onSubmit={() => setActiveField(null)} />}
+      {isMobile && activeField === "newName" && <ReactiveKeyboard value={newName} onChange={setNewName} onSubmit={() => setActiveField(null)} />}
+      {isMobile && activeField === "newDesc" && <ReactiveKeyboard value={newDesc} onChange={setNewDesc} onSubmit={() => setActiveField(null)} />}
     </div>
   );
 }

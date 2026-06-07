@@ -19,7 +19,7 @@ const quickReplies = [
 ];
 
 export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
-  const { sz, confirmationType } = useSizeContext();
+  const { sz, confirmationType, isMobile } = useSizeContext();
 
   // ==========================================
   // EXTRACT GLOBAL UNDO PREFERENCES FROM CONTEXT
@@ -191,7 +191,7 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
         </button>
         <div style={{ width: 46, height: 46, borderRadius: 23, background: avatarColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{avatar}</div>
         <span style={{ flex: 1, fontSize: 20, fontWeight: 700, color: "#2D1B69", fontFamily: "system-ui, sans-serif" }}>{name}</span>
-        <button aria-label="Call contact" onClick={() => setMode("callConfirm")} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px" }}>📞</button>
+        <SafeButton aria-label="Call contact" confirmationFor="call" onClick={() => onCall(contact)} style={{ background: "none", border: "none", fontSize: 26, cursor: "pointer", color: "#6B3FA0", padding: "8px 12px" }}>📞</SafeButton>
       </div>
 
       {/* Messages Feed Area */}
@@ -265,10 +265,10 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder="Type your message here..." rows={2}
-
-                readOnly
-
-                onFocus={() => setShowKeyboard(true)}
+                onClick={() => isMobile && setShowKeyboard(true)}
+                onFocus={() => !isMobile && setShowKeyboard(true)}
+                onBlur={() => !isMobile && setShowKeyboard(false)}
+                readOnly={isMobile}
                 style={{ flex: 1, borderRadius: 16, border: "2px solid #D0B8F5", padding: "12px 16px", fontSize: 16, resize: "none", fontFamily: "system-ui, sans-serif", outline: "none", background: "#F9F8FF", color: "#2D1B69", cursor: "pointer" }}
               />
               <SafeButton
@@ -311,6 +311,21 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
             <div style={{ width: "100%", background: "#F5F0FF", borderRadius: 16, border: "2px dashed #D0B8F5", padding: "14px", fontSize: 16, color: "#2D1B69", fontFamily: "system-ui, sans-serif", minHeight: 50, textAlign: "center" }}>
               {transcribed || "Transcribing..."}
             </div>
+            {recording && (
+              <button
+                onClick={() => {
+                  const recog = window.__activeSpeechRecog;
+                  if (recog) recog.stop();
+                }}
+                style={{
+                  padding: "12px 32px", borderRadius: 24, background: "#E87030", color: "white",
+                  border: "none", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 8,
+                  boxShadow: "0 4px 12px rgba(232,112,48,0.3)"
+                }}
+              >
+                Done Speaking
+              </button>
+            )}
           </div>
         )}
 
@@ -355,26 +370,15 @@ export default function ChatScreen({ contact, onBack, onCall, onAddContact }) {
         )}
       </div>
 
-      {/* Call Confirmation Overlay Modal */}
-      {mode === "callConfirm" && (
-        <div role="dialog" aria-modal="true" style={{ position: "absolute", inset: 0, background: "rgba(45,27,105,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 20 }}>
-          <div style={{ background: "white", borderRadius: 32, padding: "32px 24px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>📞</div>
-            <p style={{ fontSize: 22, fontWeight: 800, color: "#2D1B69", marginBottom: 8, fontFamily: "system-ui, sans-serif" }}>Confirm Call?</p>
-            <p style={{ fontSize: 15, color: "#666", marginBottom: 24, fontFamily: "system-ui, sans-serif" }}>Call '{name}'?</p>
-            <div style={{ display: "flex", gap: 16 }}>
-              <SafeButton onClick={() => setMode("main")} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#F5F5F5", color: "#666", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif" }}>NO</SafeButton>
-              <SafeButton confirmationFor="call" onClick={() => { setMode("main"); onCall(contact); }} style={{ flex: 1, height: sz?.height || 48, borderRadius: sz?.borderRadius || 16, background: "#6B3FA0", color: "white", border: "none", cursor: "pointer", fontSize: sz?.fontSize || 16, fontWeight: 700, fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 20px rgba(107,63,160,0.3)" }}>YES</SafeButton>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {mode === "main" && showKeyboard && (
+      {isMobile && mode === "main" && showKeyboard && (
         <ReactiveKeyboard
           value={input}
           onChange={setInput}
-          onSubmit={() => sendMessage(input)}
+          onSubmit={() => {
+            sendMessage(input);
+            setShowKeyboard(false);
+          }}
         />
       )}
     </div>

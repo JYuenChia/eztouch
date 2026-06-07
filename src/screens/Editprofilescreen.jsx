@@ -3,9 +3,10 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 
 import { useToast } from "../components/ToastProvider";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 export default function EditProfileScreen({ profile: profileProp, onBack, onSaved }) {
-  const { sz } = useSizeContext();
+  const { sz, isMobile } = useSizeContext();
   const profile = profileProp || {
     username: "Username",
     email: "user@example.com",
@@ -20,7 +21,7 @@ export default function EditProfileScreen({ profile: profileProp, onBack, onSave
     phone: profile.phone,
     bio: profile.bio || ""
   });
-  const [focused, setFocused] = useState("");
+  const [activeField, setActiveField] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const { addToast } = useToast();
 
@@ -92,7 +93,7 @@ export default function EditProfileScreen({ profile: profileProp, onBack, onSave
 
   const fieldStyle = (name) => ({
     width: "100%", height: 54, borderRadius: 14,
-    border: `2px solid ${focused === name ? "#7B4CC8" : "#D0B8F5"}`,
+    border: `2px solid ${activeField === name ? "#7B4CC8" : "#D0B8F5"}`,
     padding: "0 16px", fontSize: 16, background: "#F5F0FF",
     color: "#2D1B69", outline: "none", boxSizing: "border-box",
     fontFamily: "system-ui, sans-serif", marginBottom: 20,
@@ -125,16 +126,16 @@ export default function EditProfileScreen({ profile: profileProp, onBack, onSave
 
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 28px 36px" }}>
         <label style={labelStyle}>Username</label>
-        <input value={form.username} onChange={update("username")} onFocus={() => setFocused("username")} onBlur={() => setFocused("")} style={fieldStyle("username")} />
+        <input value={form.username} onChange={update("username")} onClick={() => isMobile && setActiveField("username")} onFocus={() => !isMobile && setActiveField("username")} onBlur={() => !isMobile && setActiveField(null)} readOnly={isMobile} style={fieldStyle("username")} />
 
         <label style={labelStyle}>Email</label>
-        <input value={form.email} onChange={update("email")} onFocus={() => setFocused("email")} onBlur={() => setFocused("")} style={fieldStyle("email")} type="email" />
+        <input value={form.email} onChange={update("email")} onClick={() => isMobile && setActiveField("email")} onFocus={() => !isMobile && setActiveField("email")} onBlur={() => !isMobile && setActiveField(null)} readOnly={isMobile} style={fieldStyle("email")} type="email" />
 
         <label style={labelStyle}>Phone</label>
-        <input value={form.phone} onChange={update("phone")} onFocus={() => setFocused("phone")} onBlur={() => setFocused("")} style={fieldStyle("phone")} type="tel" />
+        <input value={form.phone} onChange={update("phone")} onClick={() => isMobile && setActiveField("phone")} onFocus={() => !isMobile && setActiveField("phone")} onBlur={() => !isMobile && setActiveField(null)} readOnly={isMobile} style={fieldStyle("phone")} type="tel" />
 
         <label style={labelStyle}>Bio</label>
-        <textarea value={form.bio} onChange={update("bio")} placeholder="Write about yourself..." onFocus={() => setFocused("bio")} onBlur={() => setFocused("")}
+        <textarea value={form.bio} onChange={update("bio")} onClick={() => isMobile && setActiveField("bio")} onFocus={() => !isMobile && setActiveField("bio")} onBlur={() => !isMobile && setActiveField(null)} readOnly={isMobile} placeholder="Write about yourself..."
           style={{ ...fieldStyle("bio"), height: 100, padding: "12px 16px", resize: "none", lineHeight: 1.4 }} />
 
         <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
@@ -165,6 +166,14 @@ export default function EditProfileScreen({ profile: profileProp, onBack, onSave
             </button>
           </div>
         </div>
+      )}
+
+      {isMobile && activeField && (
+        <ReactiveKeyboard
+          value={form[activeField]}
+          onChange={(val) => setForm({ ...form, [activeField]: val })}
+          onSubmit={() => setActiveField(null)}
+        />
       )}
     </div>
   );

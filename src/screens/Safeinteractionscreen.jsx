@@ -97,8 +97,6 @@ const style =
         {safeMode && (
           <>
             <p style={{ fontSize: 14, fontWeight: 700, color: "#2D1B69", margin: "0 0 10px", fontFamily: "system-ui, sans-serif" }}>Protection Features:</p>
-            <SettingRow label="Disabled One-Tap Reaction" value={disableOneTap} onChange={setDisableOneTap} color="#F5C4A0"
-              desc="Prevents reacting to posts with a single tap — requires hold or double tap instead." />
             <SettingRow label="Require Long Press for Reactions" value={longPressMode}
 onChange={(val) => {
   setLongPressMode(val);

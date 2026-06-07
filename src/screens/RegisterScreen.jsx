@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaCheck } from "react-icons/fa";
 import { useSizeContext } from "../context/SizeContext";
 import { useToast } from "../components/ToastProvider";
+import ReactiveKeyboard from "./ReactiveKeyboard";
 
 const inputStyle = {
   width: "100%",
@@ -18,7 +19,7 @@ const inputStyle = {
   transition: "border 0.2s",
 };
 
-const Field = ({ label, icon, type = "text", placeholder, value, onChange, focused, onFocus, onBlur, name }) => (
+const Field = ({ label, icon, type = "text", placeholder, value, onChange, focused, name, onClick, onFocus, onBlur, readOnly }) => (
   <div style={{ marginBottom: 16 }}>
     <label style={{
       display: "block",
@@ -43,8 +44,10 @@ const Field = ({ label, icon, type = "text", placeholder, value, onChange, focus
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onClick={onClick}
         onFocus={onFocus}
         onBlur={onBlur}
+        readOnly={readOnly}
         style={{
           ...inputStyle,
           border: focused === name ? "2px solid #7B4CC8" : "2px solid #E0D6F5",
@@ -55,9 +58,9 @@ const Field = ({ label, icon, type = "text", placeholder, value, onChange, focus
 );
 
 export default function RegisterScreen({ onSignUp, onBack }) {
-  const { sz } = useSizeContext();
+  const { sz, isMobile } = useSizeContext();
   const [form, setForm] = useState({ username: "", email: "", password: "", confirm: "" });
-  const [focused, setFocused] = useState("");
+  const [activeField, setActiveField] = useState(null);
   const [agreed, setAgreed] = useState(false);
   const { addToast } = useToast();
 
@@ -144,9 +147,11 @@ export default function RegisterScreen({ onSignUp, onBack }) {
           placeholder="Choose a username"
           value={form.username}
           onChange={update("username")}
-          focused={focused}
-          onFocus={() => setFocused("username")}
-          onBlur={() => setFocused("")}
+          focused={activeField}
+          onClick={() => isMobile && setActiveField("username")}
+          onFocus={() => !isMobile && setActiveField("username")}
+          onBlur={() => !isMobile && setActiveField(null)}
+          readOnly={isMobile}
           name="username"
         />
 
@@ -157,9 +162,11 @@ export default function RegisterScreen({ onSignUp, onBack }) {
           placeholder="Enter your email"
           value={form.email}
           onChange={update("email")}
-          focused={focused}
-          onFocus={() => setFocused("email")}
-          onBlur={() => setFocused("")}
+          focused={activeField}
+          onClick={() => isMobile && setActiveField("email")}
+          onFocus={() => !isMobile && setActiveField("email")}
+          onBlur={() => !isMobile && setActiveField(null)}
+          readOnly={isMobile}
           name="email"
         />
 
@@ -170,9 +177,11 @@ export default function RegisterScreen({ onSignUp, onBack }) {
           placeholder="Create a password"
           value={form.password}
           onChange={update("password")}
-          focused={focused}
-          onFocus={() => setFocused("password")}
-          onBlur={() => setFocused("")}
+          focused={activeField}
+          onClick={() => isMobile && setActiveField("password")}
+          onFocus={() => !isMobile && setActiveField("password")}
+          onBlur={() => !isMobile && setActiveField(null)}
+          readOnly={isMobile}
           name="password"
         />
 
@@ -183,9 +192,11 @@ export default function RegisterScreen({ onSignUp, onBack }) {
           placeholder="Repeat your password"
           value={form.confirm}
           onChange={update("confirm")}
-          focused={focused}
-          onFocus={() => setFocused("confirm")}
-          onBlur={() => setFocused("")}
+          focused={activeField}
+          onClick={() => isMobile && setActiveField("confirm")}
+          onFocus={() => !isMobile && setActiveField("confirm")}
+          onBlur={() => !isMobile && setActiveField(null)}
+          readOnly={isMobile}
           name="confirm"
         />
 
@@ -273,6 +284,14 @@ export default function RegisterScreen({ onSignUp, onBack }) {
           Back to Login
         </button>
       </div>
+
+      {isMobile && activeField && (
+        <ReactiveKeyboard
+          value={form[activeField]}
+          onChange={(val) => setForm({ ...form, [activeField]: val })}
+          onSubmit={() => setActiveField(null)}
+        />
+      )}
     </div>
   );
 }

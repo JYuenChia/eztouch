@@ -126,6 +126,11 @@ export default function ReactiveKeyboard({ value, onChange, onSubmit, themeColor
 
   return (
     <div style={{
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 9999,
       width: "100%",
       background: "#F0EBFF",
       padding: "12px 8px 24px",
@@ -133,7 +138,8 @@ export default function ReactiveKeyboard({ value, onChange, onSubmit, themeColor
       display: "flex",
       flexDirection: "column",
       gap: 8,
-      boxSizing: "border-box"
+      boxSizing: "border-box",
+      boxShadow: "0 -4px 16px rgba(0,0,0,0.15)"
     }}>
       {layouts[layout].map((row, rowIdx) => (
         <div key={rowIdx} style={{ display: "flex", width: "100%", gap: 6 }}>
